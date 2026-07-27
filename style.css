@@ -1,9 +1,72 @@
 /* ─────────────────────────────────────────────
    Cho's TEST — 세브란스 오케스트라 파트 연습기
-   밝은 테마 + 연세 네이비 포인트
+   연세 네이비 포인트 · 밝은 화면과 어두운 화면 모두 지원
    ───────────────────────────────────────────── */
 :root {
-  --navy: #00366e;          /* 연세 네이비 */
+  --navy: #00366e;          /* 제목·강조 */
+  --navy-600: #084b8f;      /* 주요 버튼 */
+  --navy-300: #7fa5cd;      /* 보조선 */
+  --ink: #16202e;           /* 본문 */
+  --muted: #66768c;         /* 보조 글자 */
+  --line: #e3e9f1;
+  --line-soft: #eef2f7;
+  --surface: #ffffff;       /* 카드·입력칸 바탕 */
+  --chip: #f2f6fb;          /* 배지·둥근버튼 바탕 */
+  --chip-line: #dfe8f4;
+  --soft: #f4f8fd;          /* 정보상자·탭 바탕 */
+  --hover: #f7fafd;
+  --track: #dde5ef;         /* 슬라이더 홈 */
+  --shadow: rgba(16, 32, 56, 0.16);
+  --ring: rgba(8, 75, 143, 0.12);
+  --page: linear-gradient(180deg, #f7f9fc 0%, #eef2f7 100%);
+  --page-glow: radial-gradient(900px 420px at 50% -8%, #ffffff 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+/* 어두운 화면 — 색을 뒤집지 않고 따로 고른다 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --navy: #8fbdf5;
+    --navy-600: #4a86f7;
+    --navy-300: #40587a;
+    --ink: #e7edf6;
+    --muted: #94a4bb;
+    --line: #253044;
+    --line-soft: #1b2534;
+    --surface: #151c28;
+    --chip: #1b2536;
+    --chip-line: #2a3548;
+    --soft: #172232;
+    --hover: #1c2738;
+    --track: #2b374a;
+    --shadow: rgba(0, 0, 0, 0.5);
+    --ring: rgba(74, 134, 247, 0.25);
+    --page: linear-gradient(180deg, #0e141d 0%, #0a0f16 100%);
+    --page-glow: radial-gradient(900px 420px at 50% -8%, #17202e 0%, rgba(23, 32, 46, 0) 70%);
+  }
+}
+
+/* 보는 사람이 직접 고른 테마가 항상 이긴다 */
+:root[data-theme="dark"] {
+  --navy: #8fbdf5;
+  --navy-600: #4a86f7;
+  --navy-300: #40587a;
+  --ink: #e7edf6;
+  --muted: #94a4bb;
+  --line: #253044;
+  --line-soft: #1b2534;
+  --surface: #151c28;
+  --chip: #1b2536;
+  --chip-line: #2a3548;
+  --soft: #172232;
+  --hover: #1c2738;
+  --track: #2b374a;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --ring: rgba(74, 134, 247, 0.25);
+  --page: linear-gradient(180deg, #0e141d 0%, #0a0f16 100%);
+  --page-glow: radial-gradient(900px 420px at 50% -8%, #17202e 0%, rgba(23, 32, 46, 0) 70%);
+}
+:root[data-theme="light"] {
+  --navy: #00366e;
   --navy-600: #084b8f;
   --navy-300: #7fa5cd;
   --ink: #16202e;
@@ -11,8 +74,15 @@
   --line: #e3e9f1;
   --line-soft: #eef2f7;
   --surface: #ffffff;
-  --bg: #eef2f7;
+  --chip: #f2f6fb;
+  --chip-line: #dfe8f4;
+  --soft: #f4f8fd;
+  --hover: #f7fafd;
   --track: #dde5ef;
+  --shadow: rgba(16, 32, 56, 0.16);
+  --ring: rgba(8, 75, 143, 0.12);
+  --page: linear-gradient(180deg, #f7f9fc 0%, #eef2f7 100%);
+  --page-glow: radial-gradient(900px 420px at 50% -8%, #ffffff 0%, rgba(255, 255, 255, 0) 70%);
 }
 
 * { box-sizing: border-box; }
@@ -23,9 +93,7 @@ body {
   padding: 40px 16px;
   display: grid;
   place-items: start center;
-  background:
-    radial-gradient(900px 420px at 50% -8%, #ffffff 0%, rgba(255, 255, 255, 0) 70%),
-    linear-gradient(180deg, #f7f9fc 0%, var(--bg) 100%);
+  background: var(--page-glow), var(--page);
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
     "Pretendard", "Segoe UI", sans-serif;
@@ -38,9 +106,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 20px;
   padding: 30px 30px 26px;
-  box-shadow:
-    0 1px 2px rgba(16, 32, 56, 0.04),
-    0 14px 40px -12px rgba(16, 32, 56, 0.16);
+  box-shadow: 0 1px 2px rgba(16, 32, 56, 0.04), 0 14px 40px -12px var(--shadow);
 }
 
 /* ── 헤더 ── */
@@ -49,14 +115,13 @@ body {
   border-bottom: 1px solid var(--line-soft);
   margin-bottom: 22px;
 }
-
 .brand {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   padding: 5px 12px 5px 8px;
-  background: #f2f6fb;
-  border: 1px solid #dfe8f4;
+  background: var(--chip);
+  border: 1px solid var(--chip-line);
   border-radius: 999px;
   margin-bottom: 14px;
 }
@@ -67,77 +132,23 @@ body {
   letter-spacing: 0.02em;
   color: var(--navy);
 }
-
 h1 {
   margin: 0 0 6px;
   font-size: 1.9rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--navy);
+  text-wrap: balance;
 }
-h1 span {
-  color: var(--ink);
-  font-weight: 300;
-}
-
-.subtitle {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-/* ── 폼 ── */
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin: 0 0 16px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--muted);
-  letter-spacing: 0.01em;
-}
-
-select {
-  appearance: none;
-  background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5 6 6.5l5-5' fill='none' stroke='%2366768c' stroke-width='1.6' stroke-linecap='round'/></svg>") no-repeat right 14px center;
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 13px 40px 13px 14px;
-  font-size: 1rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-select:hover { border-color: var(--navy-300); }
-select:focus {
-  outline: none;
-  border-color: var(--navy-600);
-  box-shadow: 0 0 0 3px rgba(8, 75, 143, 0.12);
-}
-
-.info {
-  margin: 0 0 20px;
-  padding: 11px 14px;
-  background: #f4f8fd;
-  border-left: 3px solid var(--navy-600);
-  border-radius: 0 8px 8px 0;
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: var(--navy);
-  line-height: 1.45;
-}
-.info:empty { display: none; }
+h1 span { color: var(--ink); font-weight: 300; }
+.subtitle { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
 
 /* ── 탭 ── */
 .tabs {
   display: flex;
   gap: 4px;
   padding: 4px;
-  background: #f2f5fa;
+  background: var(--soft);
   border: 1px solid var(--line);
   border-radius: 12px;
   margin-bottom: 20px;
@@ -154,14 +165,13 @@ select:focus {
 }
 .tab:hover { color: var(--navy); }
 .tab.active {
-  background: #fff;
+  background: var(--surface);
   color: var(--navy);
   box-shadow: 0 1px 3px rgba(16, 32, 56, 0.12);
 }
 
 /* ── 단독 메트로놈 ── */
 .mbig { text-align: center; padding: 6px 0 4px; }
-
 .mbeats {
   display: flex;
   justify-content: center;
@@ -178,10 +188,8 @@ select:focus {
 .mdot.on {
   background: var(--navy-600);
   transform: scale(1.45);
-  box-shadow: 0 0 14px rgba(8, 75, 143, .45);
+  box-shadow: 0 0 14px var(--ring);
 }
-.mdot:first-child.on { background: var(--navy); }
-
 .mbpm {
   display: flex;
   align-items: center;
@@ -210,30 +218,68 @@ button.mstep {
   width: 40px; height: 40px;
   border-radius: 50%;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   color: var(--navy);
   font-size: 1.25rem;
   font-weight: 700;
   line-height: 1;
 }
-button.mstep:hover { background: #f2f6fb; border-color: var(--navy-300); }
+button.mstep:hover { background: var(--chip); border-color: var(--navy-300); }
+.mmark { margin: 8px 0 20px; font-size: 0.82rem; font-style: italic; color: var(--muted); }
 
-.mmark {
-  margin: 8px 0 20px;
-  font-size: 0.82rem;
-  font-style: italic;
+/* ── 폼 ── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0 0 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
   color: var(--muted);
 }
-
-button.big-btn { padding: 15px; font-size: 1rem; }
-button.primary {
-  background: var(--navy-600);
-  color: #fff;
-  border-color: var(--navy-600);
+select {
+  appearance: none;
+  background-color: var(--surface);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5 6 6.5l5-5' fill='none' stroke='%2366768c' stroke-width='1.6' stroke-linecap='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 13px 40px 13px 14px;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
 }
-button.primary:hover { background: var(--navy); }
-button.primary.on { background: #b3402f; border-color: #b3402f; }
-button.primary.on:hover { background: #973526; }
+select:hover { border-color: var(--navy-300); }
+select:focus-visible, input:focus-visible, button:focus-visible {
+  outline: none;
+  border-color: var(--navy-600);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+select.mini {
+  padding: 7px 32px 7px 11px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  border-radius: 9px;
+  background-position: right 10px center;
+  min-width: 92px;
+}
+
+.info {
+  margin: 0 0 20px;
+  padding: 11px 14px;
+  background: var(--soft);
+  border-left: 3px solid var(--navy-600);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--navy);
+  line-height: 1.45;
+}
+.info:empty { display: none; }
 
 /* ── 원곡 (유튜브) ── */
 #origWrap {
@@ -247,20 +293,11 @@ button.primary.on:hover { background: #973526; }
   justify-content: space-between;
   margin-bottom: 9px;
 }
-.orig-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--muted);
-  letter-spacing: 0.01em;
-}
+.orig-title { font-size: 0.78rem; font-weight: 700; color: var(--muted); }
 .linkbtn {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 0.76rem;
-  font-weight: 600;
-  color: var(--navy-600);
-  text-decoration: underline;
+  background: none; border: none; padding: 0;
+  font-size: 0.76rem; font-weight: 600;
+  color: var(--navy-600); text-decoration: underline;
 }
 .yt {
   position: relative;
@@ -271,23 +308,16 @@ button.primary.on:hover { background: #973526; }
   background: #0d1117;
 }
 .yt iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-
 .ytform { display: flex; gap: 8px; margin-top: 9px; }
 .ytform input {
-  flex: 1;
-  min-width: 0;
+  flex: 1; min-width: 0;
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 10px;
   font-size: 0.86rem;
   font-family: inherit;
   color: var(--ink);
-  background: #fff;
-}
-.ytform input:focus {
-  outline: none;
-  border-color: var(--navy-600);
-  box-shadow: 0 0 0 3px rgba(8, 75, 143, 0.12);
+  background: var(--surface);
 }
 .ytform button {
   padding: 10px 18px;
@@ -302,7 +332,6 @@ button.primary.on:hover { background: #973526; }
 
 /* ── 탐색바 ── */
 .seekwrap { margin: 4px 0 2px; }
-
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -311,37 +340,28 @@ input[type="range"] {
   cursor: pointer;
 }
 input[type="range"]::-webkit-slider-runnable-track {
-  height: 6px;
-  border-radius: 99px;
-  background: var(--track);
+  height: 6px; border-radius: 99px; background: var(--track);
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 16px; height: 16px;
   margin-top: -5px;
   border-radius: 50%;
   background: var(--navy-600);
-  border: 2px solid #fff;
-  box-shadow: 0 1px 4px rgba(16, 32, 56, 0.3);
-  transition: transform 0.12s;
+  border: 2px solid var(--surface);
+  box-shadow: 0 1px 4px var(--shadow);
+  transition: transform .12s;
 }
 input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.18); }
-
-/* 진행 구간 채우기 (JS가 --p 를 0~100 으로 갱신) */
-#seek::-webkit-slider-runnable-track {
-  background: linear-gradient(
-    to right,
-    var(--navy-600) 0 calc(var(--p, 0) * 1%),
-    var(--track) calc(var(--p, 0) * 1%) 100%);
+#seek::-webkit-slider-runnable-track,
+#mBpm::-webkit-slider-runnable-track {
+  background: linear-gradient(to right,
+    var(--navy-600) 0 calc(var(--p, 0) * 1%), var(--track) calc(var(--p, 0) * 1%) 100%);
 }
-#tempo::-webkit-slider-runnable-track {
-  background: linear-gradient(
-    to right,
-    var(--navy-300) 0 calc(var(--p, 0) * 1%),
-    var(--track) calc(var(--p, 0) * 1%) 100%);
+#speed::-webkit-slider-runnable-track {
+  background: linear-gradient(to right,
+    var(--navy-300) 0 calc(var(--p, 0) * 1%), var(--track) calc(var(--p, 0) * 1%) 100%);
 }
-
 .times {
   display: flex;
   justify-content: space-between;
@@ -360,77 +380,94 @@ input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.18); }
   gap: 22px;
   margin: 16px 0 10px;
 }
-
-/* 버튼 + 그 아래 라벨 */
-.tslot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 7px;
-}
-/* 작은 버튼(54px)을 큰 재생 버튼(68px) 높이 가운데에 맞춰 라벨 줄을 정렬 */
+.tslot { display: flex; flex-direction: column; align-items: center; gap: 7px; }
 .tslot > button.round:not(.big) { margin: 7px 0; }
-
 .tlabel {
   font-size: 0.71rem;
   font-weight: 600;
   color: var(--muted);
   white-space: nowrap;
-  letter-spacing: -0.01em;
 }
-
 .hintline {
   margin: 0 0 20px;
   text-align: center;
   font-size: 0.74rem;
   color: var(--muted);
-  letter-spacing: 0.01em;
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, transform 0.06s, box-shadow 0.15s;
-}
+button { font-family: inherit; cursor: pointer;
+  transition: background .15s, border-color .15s, transform .06s, box-shadow .15s; }
 button:active { transform: translateY(1px); }
 button:disabled { opacity: 0.45; cursor: default; }
 
 button.round {
-  width: 54px;
-  height: 54px;
+  width: 54px; height: 54px;
   border-radius: 50%;
   padding: 0;
-  display: grid;
-  place-items: center;
-  font-size: 0.95rem;
+  display: grid; place-items: center;
   color: var(--navy);
-  background: #f2f6fb;
-  border: 1px solid #dfe8f4;
+  background: var(--chip);
+  border: 1px solid var(--chip-line);
 }
 button.round svg { display: block; }
-button.round:hover { background: #e7effa; border-color: var(--navy-300); }
-
+button.round:hover { background: var(--hover); border-color: var(--navy-300); }
 button.round.big {
-  width: 68px;
-  height: 68px;
+  width: 68px; height: 68px;
   font-size: 1.25rem;
   color: #fff;
   background: var(--navy-600);
   border: none;
-  box-shadow: 0 6px 18px -4px rgba(8, 75, 143, 0.5);
+  box-shadow: 0 6px 18px -4px var(--ring);
 }
 button.round.big:hover { background: var(--navy); }
 
-/* ── 옵션 행 ── */
-.control {
+/* ── 구간 반복 ── */
+.loopbar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 11px 0;
+  gap: 7px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  margin-bottom: 14px;
 }
+.looplabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-right: 2px;
+}
+button.chip {
+  padding: 6px 12px;
+  border: 1px solid var(--chip-line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+button.chip:hover { border-color: var(--navy-300); }
+button.chip.set {
+  background: var(--navy-600);
+  border-color: var(--navy-600);
+  color: #fff;
+}
+button.chip.ghost { color: var(--muted); }
+.loopinfo {
+  flex: 1 1 100%;
+  font-size: 0.74rem;
+  color: var(--navy);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.loopinfo:empty { display: none; }
+
+/* ── 옵션 행 ── */
+.control { display: flex; align-items: center; gap: 12px; margin: 11px 0; }
 .control label {
-  width: 78px;
-  flex: 0 0 auto;
+  width: 78px; flex: 0 0 auto;
   color: var(--muted);
   font-size: 0.84rem;
   font-weight: 600;
@@ -444,19 +481,8 @@ button.round.big:hover { background: var(--navy); }
   font-weight: 600;
   color: var(--ink);
 }
-/* 옵션 행 안의 작은 드롭다운 (메트로놈 인N) */
-select.mini {
-  padding: 7px 32px 7px 11px;
-  font-size: 0.86rem;
-  font-weight: 600;
-  border-radius: 9px;
-  background-position: right 10px center;
-  min-width: 92px;
-}
-
 .control input[type="checkbox"] {
-  width: 19px;
-  height: 19px;
+  width: 19px; height: 19px;
   accent-color: var(--navy-600);
   cursor: pointer;
 }
@@ -468,12 +494,17 @@ select.mini {
   padding: 13px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   font-size: 0.92rem;
   font-weight: 600;
 }
-.buttons button:hover { background: #f7fafd; border-color: var(--navy-300); }
+.buttons button:hover { background: var(--hover); border-color: var(--navy-300); }
+button.big-btn { padding: 15px; font-size: 1rem; }
+button.primary { background: var(--navy-600); color: #fff; border-color: var(--navy-600); }
+button.primary:hover { background: var(--navy); }
+button.primary.on { background: #b3402f; border-color: #b3402f; }
+button.primary.on:hover { background: #973526; }
 
 .status {
   min-height: 1.2em;
@@ -484,7 +515,7 @@ select.mini {
   text-align: center;
 }
 
-/* ── 새 곡 추가 안내 ── */
+/* ── 새 곡 추가 ── */
 .addhelp {
   margin-top: 22px;
   padding-top: 18px;
@@ -502,9 +533,9 @@ select.mini {
 .addhelp summary::before { content: "＋ "; }
 .addhelp[open] summary::before { content: "－ "; }
 .addhelp p { margin: 12px 0 7px; line-height: 1.55; }
-/* 새 곡 추가 — 업로드 / 트랙 선택 */
+
 .uprow { display: flex; gap: 8px; align-items: center; margin: 10px 0 4px; flex-wrap: wrap; }
-.uprow input[type="file"] { flex: 1; min-width: 0; font-size: 0.78rem; }
+.uprow input[type="file"] { flex: 1; min-width: 0; font-size: 0.78rem; color: var(--ink); }
 .uprow button, .saverow button {
   padding: 9px 16px;
   border: none;
@@ -516,10 +547,8 @@ select.mini {
   white-space: nowrap;
 }
 .uprow button:hover, .saverow button:hover { background: var(--navy); }
-
 .tracklead { margin: 14px 0 8px; font-weight: 600; color: var(--ink); font-size: 0.82rem; }
 .tracklead span { font-weight: 400; color: var(--muted); }
-
 .tracklist {
   max-height: 230px;
   overflow-y: auto;
@@ -536,28 +565,29 @@ select.mini {
   font-size: 0.82rem;
 }
 .trackrow:last-child { border-bottom: none; }
-.trackrow:hover { background: #f6f9fd; }
+.trackrow:hover { background: var(--hover); }
 .trackrow input { accent-color: var(--navy-600); flex: 0 0 auto; }
-.tname { font-weight: 600; color: var(--ink); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tname {
+  font-weight: 600; color: var(--ink); flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 .tmeta { color: var(--muted); font-size: 0.75rem; white-space: nowrap; }
-
 .saverow { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 .saverow input[type="text"] {
-  flex: 1;
-  min-width: 120px;
+  flex: 1; min-width: 120px;
   padding: 9px 12px;
   border: 1px solid var(--line);
   border-radius: 9px;
   font-size: 0.84rem;
   font-family: inherit;
   color: var(--ink);
+  background: var(--surface);
 }
 .saverow select { padding: 9px 30px 9px 11px; font-size: 0.82rem; border-radius: 9px; }
 .upnote { font-size: 0.75rem; color: var(--muted); margin-top: 14px; }
-
 .addhelp code {
   display: block;
-  background: #f6f8fb;
+  background: var(--soft);
   border: 1px solid var(--line);
   border-radius: 9px;
   padding: 11px 12px;
@@ -565,4 +595,8 @@ select.mini {
   color: var(--navy);
   overflow-x: auto;
   white-space: pre;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }

@@ -50,8 +50,16 @@ git add -A && git commit -m "곡 추가" && git push
 ### 악보를 어디서 구하나
 
 - **[markGotham/hauptstimme](https://github.com/markGotham/hauptstimme)** — 베토벤 교향곡 1~9번,
-  하이든·브람스·브루크너·슈베르트 등 오케스트라 총보 MusicXML (MIT/CC0)
-- MuseScore 등 악보 프로그램에서 **MusicXML 내보내기** 한 파일도 그대로 쓸 수 있다
+  하이든·브람스·브루크너·슈베르트 등 오케스트라 총보 MusicXML (MIT/CC0). **여기 있는 곡이 가장 정확하다.**
+- **[MuseScore.com](https://musescore.com)** — 이용자들이 올린 총보가 많다. 곡 페이지에서
+  MusicXML(또는 MIDI)로 내려받아 이 앱에 넣으면 된다.
+- MuseScore·시벨리우스 등 악보 프로그램에서 **MusicXML 내보내기** 한 파일도 그대로 쓸 수 있다.
+
+> **프로메테우스 서곡(Op.43)·피아노 협주곡 3번(Op.37)** 은 위 CC0 저장소에 없다(교향곡만 수록).
+> 무료 MIDI 사이트에도 올라와 있지만 **누가 만든 시퀀스인지·재배포해도 되는지가 불분명**해서
+> 공개 사이트에 함께 올리지 않았다. MuseScore 등에서 총보 파일을 받아
+> **새 곡 추가**로 넣으면 다른 곡과 똑같이 동작한다.
+> (오케스트라 총보를 받아야 한다. 피아노 편곡본에는 콘트라베이스 성부가 없다.)
 
 ## 기능
 

@@ -83,6 +83,7 @@ let sampler = null, loadedInstrument = null, clickSynth = null;
 let notePart = null, clickPart = null;
 let seeking = false, ready = false;
 let currentPieceId = null;
+let loopStart = null, loopEnd = null;   // 구간 반복 (초)
 let analyzed = null;   // MIDI 분석 결과
 
 // ---------- DOM ----------
@@ -94,6 +95,8 @@ const speedSlider = $("speed"), speedValue = $("speedValue");
 const metroSel = $("metronome"), metroNote = $("metroNote");
 const celloRow = $("celloRow"), includeCello = $("includeCello"), celloNote = $("celloNote");
 const octaveDown = $("octaveDown"), wavBtn = $("wavBtn");
+const loopABtn = $("loopA"), loopBBtn = $("loopB"), loopClearBtn = $("loopClear"), loopInfo = $("loopInfo");
+const countIn = $("countIn");
 const origWrap = $("origWrap"), ytHolder = $("ytHolder"), ytForm = $("ytForm");
 const ytUrl = $("ytUrl"), ytSave = $("ytSave"), ytEdit = $("ytEdit");
 const scoreFile = $("scoreFile"), analyzeBtn = $("analyzeBtn"), trackBox = $("trackBox");
@@ -151,8 +154,15 @@ async function loadPieces(selectId) {
       });
       pieceSel.appendChild(g);
     }
-    if (selectId) { pieceSel.value = selectId; await selectPiece(selectId); }
-    else setStatus("곡을 선택하면 바로 재생할 수 있어요.");
+    // 지난번에 듣던 곡이 아직 목록에 있으면 그대로 이어서
+    const wanted = selectId || pendingPiece;
+    pendingPiece = null;
+    if (wanted && [...pieceSel.options].some((o) => o.value === wanted)) {
+      pieceSel.value = wanted;
+      await selectPiece(wanted);
+    } else {
+      setStatus("곡을 선택하면 바로 재생할 수 있어요.");
+    }
   } catch (e) {
     setStatus("곡 목록을 불러오지 못했어요: " + e.message, true);
   }
@@ -161,10 +171,13 @@ async function loadPieces(selectId) {
 // ---------- 원곡 유튜브 ----------
 function renderYouTube(videoId) {
   if (videoId) {
-    ytHolder.innerHTML =
-      `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}" title="원곡"
-        frameborder="0" allowfullscreen
-        allow="accelerometer; clipboard-write; encrypted-media; picture-in-picture"></iframe>`;
+    // 외부 삽입이 막힌 배포판에서는 새 탭으로 여는 링크로 대신한다
+    ytHolder.innerHTML = window.NO_EXTERNAL
+      ? `<a class="ytlink" href="https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener">
+           ▶ 유튜브에서 원곡 열기</a>`
+      : `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}" title="원곡"
+          frameborder="0" allowfullscreen
+          allow="accelerometer; clipboard-write; encrypted-media; picture-in-picture"></iframe>`;
     ytHolder.hidden = false; ytForm.hidden = true; ytEdit.hidden = false;
   } else {
     ytHolder.innerHTML = "";
@@ -187,7 +200,9 @@ async function saveYouTube() {
 // ---------- 곡 선택 ----------
 async function selectPiece(id) {
   stop();
+  clearLoop();
   currentPieceId = id;
+  savePrefs();
   if (!id) { player.hidden = true; origWrap.hidden = true; infoEl.textContent = ""; return; }
   setStatus("불러오는 중…");
   try {
@@ -295,6 +310,56 @@ function schedule() {
   clickPart.start(0);
 }
 
+// ---------- 구간 반복 ----------
+function updateLoopUI() {
+  const has = loopStart !== null && loopEnd !== null;
+  loopClearBtn.hidden = !(loopStart !== null || loopEnd !== null);
+  loopABtn.classList.toggle("set", loopStart !== null);
+  loopBBtn.classList.toggle("set", loopEnd !== null);
+  loopInfo.textContent = has ? `${fmt(loopStart)} → ${fmt(loopEnd)} 반복`
+    : loopStart !== null ? `A ${fmt(loopStart)} · B 지점을 정하세요`
+    : "";
+}
+
+// 반복은 오디오 클럭(Transport)에 맡긴다.
+// 화면 갱신(requestAnimationFrame)에 의존하면 다른 탭을 보고 있을 때 되돌아오지 않는다.
+function applyLoop() {
+  const on = loopStart !== null && loopEnd !== null && loopEnd > loopStart;
+  if (on) {
+    const ppq = Tone.Transport.PPQ;
+    Tone.Transport.loopStart = Math.round(loopStart * ppq) + "i";
+    Tone.Transport.loopEnd = Math.round(loopEnd * ppq) + "i";
+  }
+  Tone.Transport.loop = on;
+}
+
+function setLoopA() {
+  loopStart = position();
+  if (loopEnd !== null && loopEnd <= loopStart) loopEnd = null;
+  applyLoop(); updateLoopUI();
+}
+function setLoopB() {
+  const p = position();
+  if (loopStart === null) loopStart = 0;
+  if (p <= loopStart) { setStatus("B 지점은 A 지점보다 뒤여야 해요.", true); return; }
+  loopEnd = p;
+  applyLoop(); updateLoopUI();
+  setStatus(`${fmt(loopStart)}~${fmt(loopEnd)} 구간을 반복해요.`);
+}
+function clearLoop() {
+  loopStart = loopEnd = null;
+  applyLoop(); updateLoopUI();
+}
+
+// 현재 위치 부근의 한 박 길이(초) — 카운트인 속도에 쓴다
+function beatInterval() {
+  const p = position();
+  for (let i = 0; i < beatGrid.length - 1; i++) {
+    if (beatGrid[i + 1] > p) return Math.max(0.15, (beatGrid[i + 1] - beatGrid[i]) / speed());
+  }
+  return 60 / (bpm * speed());       // 박 격자가 없을 때의 대비책
+}
+
 // ---------- 재생 컨트롤 ----------
 async function togglePlay() {
   if (!notes.length) return;
@@ -306,7 +371,25 @@ async function togglePlay() {
   await ensureSampler(instrument);
   if (!notePart) schedule();
   Tone.Transport.bpm.value = 60 * speed();
-  Tone.Transport.start();
+
+  if (countIn.checked) {
+    // 시작 전 4박을 세어준다 (들어가는 타이밍 잡기 좋게).
+    // 메트로놈과 같은 악기를 쓰면 예약 시각이 꼬이므로 전용 악기를 새로 만들어 쓰고 버린다.
+    const iv = beatInterval();
+    const t0 = Tone.now() + 0.15;
+    const cs = new Tone.Synth({
+      oscillator: { type: "square" },
+      envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.02 },
+      volume: -12,
+    }).toDestination();
+    for (let i = 0; i < 4; i++) {
+      cs.triggerAttackRelease(i === 0 ? "G5" : "C5", "32n", t0 + i * iv);
+    }
+    setTimeout(() => cs.dispose(), (4 * iv + 1) * 1000);
+    Tone.Transport.start(t0 + 4 * iv);
+  } else {
+    Tone.Transport.start();
+  }
   playBtn.textContent = "❚❚";
 }
 
@@ -330,7 +413,8 @@ const skip = (delta) => seekTo(position() + delta);
 function tick() {
   if (ready && !seeking && Tone.Transport.state === "started") {
     const t = position();
-    if (t >= duration) stop();
+    // 반복 중에는 끝까지 갔다고 멈추면 안 된다 (Transport 가 알아서 되돌린다)
+    if (!Tone.Transport.loop && t >= duration) stop();
     else { seek.value = t; curTime.textContent = fmt(t); paint(seek); }
   }
   requestAnimationFrame(tick);
@@ -595,6 +679,40 @@ document.querySelectorAll(".tab").forEach((btn) => {
 drawBeats();
 setBpm(90);
 
+// ---------- 설정 기억하기 (이 브라우저에) ----------
+const PREF_KEY = "chostest.prefs";
+const readPrefs = () => { try { return JSON.parse(localStorage.getItem(PREF_KEY) || "{}"); } catch { return {}; } };
+
+function savePrefs() {
+  localStorage.setItem(PREF_KEY, JSON.stringify({
+    piece: currentPieceId,
+    speed: speedSlider.value,
+    metro: metroSel.value,
+    cello: includeCello.checked,
+    octave: octaveDown.checked,
+    countIn: countIn.checked,
+    mBpm: mBpm.value,
+    mBeat: mBeatSel.value,
+    mSub: mSub.value,
+  }));
+}
+
+function applyPrefs() {
+  const p = readPrefs();
+  if (p.speed) { speedSlider.value = p.speed; speedValue.textContent = p.speed + "%"; paint(speedSlider); }
+  if (p.metro) { metroSel.value = p.metro; metroSel.dispatchEvent(new Event("change")); }
+  if (p.cello) includeCello.checked = true;
+  if (p.octave) octaveDown.checked = true;
+  if (p.countIn) countIn.checked = true;
+  if (p.mBpm) setBpm(Number(p.mBpm));
+  if (p.mBeat) { mBeatSel.value = p.mBeat; mBeatSel.dispatchEvent(new Event("change")); }
+  if (p.mSub) mSub.value = p.mSub;
+  return p.piece || null;
+}
+
+[speedSlider, metroSel, includeCello, octaveDown, countIn, mBpm, mBeatSel, mSub]
+  .forEach((el) => el.addEventListener("change", savePrefs));
+
 // ---------- 이벤트 ----------
 pieceSel.addEventListener("change", (e) => selectPiece(e.target.value));
 playBtn.addEventListener("click", togglePlay);
@@ -604,6 +722,10 @@ wavBtn.addEventListener("click", downloadWav);
 // 업로드 UI 는 정적 배포판에 없으므로 있을 때만 연결한다
 if (analyzeBtn) analyzeBtn.addEventListener("click", analyzeScore);
 if (saveScoreBtn) saveScoreBtn.addEventListener("click", saveScore);
+
+loopABtn.addEventListener("click", setLoopA);
+loopBBtn.addEventListener("click", setLoopB);
+loopClearBtn.addEventListener("click", clearLoop);
 
 ytSave.addEventListener("click", saveYouTube);
 ytUrl.addEventListener("keydown", (e) => { if (e.key === "Enter") saveYouTube(); });
@@ -655,4 +777,5 @@ document.addEventListener("keydown", (e) => {
   else if (!onMetro && e.code === "ArrowRight") { e.preventDefault(); skip(SKIP); }
 });
 
+let pendingPiece = applyPrefs();   // 저장된 설정을 먼저 적용하고, 듣던 곡을 이어서 연다
 loadPieces();
