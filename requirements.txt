@@ -1,0 +1,18 @@
+# ── Python 패키지 ──  (설치: .venv/bin/pip install -r requirements.txt)
+music21           # MusicXML 파싱 + MIDI 생성
+fastapi           # 웹 백엔드
+uvicorn           # ASGI 서버
+python-multipart  # 파일 업로드
+PyMuPDF           # 테스트용 PDF 조작 (서버 필수는 아님)
+
+# ── OMR 엔진: Audiveris (pip 아님, 별도 앱) ──
+# 악보 인식은 Audiveris 앱이 담당한다 (자체 Java 런타임 내장, 설치 불필요).
+# macOS Apple Silicon 설치:
+#   1) https://github.com/Audiveris/audiveris/releases 에서
+#      Audiveris-x.y.z-macosx-arm64.dmg 다운로드
+#   2) 마운트 후 Audiveris.app 을 ~/orchestra-tools/ 로 복사
+#   3) xattr -dr com.apple.quarantine ~/orchestra-tools/Audiveris.app
+# server.py 의 AUDIVERIS 상수가 이 경로를 가리킨다.
+#
+# (참고) 초기엔 oemer(딥러닝 OMR, pip)를 썼으나 CPU에서 ~8.7분/페이지로 너무 느렸고
+#        CoreML 가속도 모델 비호환이라, Audiveris(~29초/페이지)로 교체함.

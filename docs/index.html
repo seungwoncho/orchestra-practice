@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cho's TEST — 세브란스 오케스트라</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/tone@14.8.49/build/Tone.js"></script>
+</head>
+<body>
+  <main class="card">
+    <header class="head">
+      <div class="brand">
+        <span class="brand-mark">🎻</span>
+        <span class="brand-name">세브란스 오케스트라</span>
+      </div>
+      <h1>Cho's <span>TEST</span></h1>
+      <p class="subtitle">올해 연주곡의 내 파트만 골라 들으며 박자 잡기</p>
+    </header>
+
+    <!-- 탭 -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="practice">파트 연습</button>
+      <button class="tab" data-tab="metro">메트로놈</button>
+    </nav>
+
+    <!-- ═══ 단독 메트로놈 ═══ -->
+    <section id="metroTab" hidden>
+      <div class="mbig">
+        <div class="mbeats" id="mBeats"></div>
+        <div class="mbpm">
+          <button id="mMinus" class="mstep">−</button>
+          <div class="mbpmnum"><span id="mBpmVal">90</span><small>BPM</small></div>
+          <button id="mPlus" class="mstep">+</button>
+        </div>
+        <input type="range" id="mBpm" min="30" max="240" value="90" />
+        <p class="mmark" id="mMark">Andante</p>
+      </div>
+
+      <div class="control">
+        <label for="mBeat">박자</label>
+        <select id="mBeat" class="mini">
+          <option value="1">인 1</option>
+          <option value="2">인 2</option>
+          <option value="3">인 3</option>
+          <option value="4" selected>인 4</option>
+          <option value="6">인 6</option>
+        </select>
+        <span class="value" id="mBeatNote">4박마다 강세</span>
+      </div>
+
+      <div class="control">
+        <label for="mSub">잘게</label>
+        <select id="mSub" class="mini">
+          <option value="1" selected>기본</option>
+          <option value="2">8분음표</option>
+          <option value="3">셋잇단</option>
+          <option value="4">16분음표</option>
+        </select>
+        <span class="value">보조 클릭</span>
+      </div>
+
+      <div class="buttons">
+        <button id="mToggle" class="primary big-btn">▶ 시작</button>
+        <button id="mTap">탭 템포</button>
+      </div>
+      <p class="hintline">스페이스바로 시작/정지 · T 키를 곡에 맞춰 두드리면 템포가 잡혀요</p>
+    </section>
+
+    <!-- ═══ 파트 연습 ═══ -->
+    <div id="practiceTab">
+    <!-- 곡 선택 -->
+    <label class="field">
+      <span>곡</span>
+      <select id="piece"></select>
+    </label>
+
+    <p class="info" id="info"></p>
+
+    <!-- ── 원곡 (유튜브) ── -->
+    <section id="origWrap" hidden>
+      <div class="orig-head">
+        <span class="orig-title">원곡 듣기</span>
+        <button id="ytEdit" class="linkbtn">링크 바꾸기</button>
+      </div>
+      <div id="ytHolder" class="yt"></div>
+      <div id="ytForm" class="ytform" hidden>
+        <input type="text" id="ytUrl" placeholder="유튜브 주소 붙여넣기" />
+        <button id="ytSave">저장</button>
+      </div>
+    </section>
+
+    <!-- ── 재생 컨트롤 ── -->
+    <section id="player" hidden>
+      <div class="seekwrap">
+        <input type="range" id="seek" min="0" max="100" value="0" step="0.05" />
+        <div class="times">
+          <span id="curTime">0:00</span>
+          <span id="totTime">0:00</span>
+        </div>
+      </div>
+
+      <div class="transport">
+        <div class="tslot">
+          <button id="backBtn" class="round" title="10초 뒤로" aria-label="10초 뒤로">
+            <svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true">
+              <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" fill="currentColor"/>
+              <text x="12" y="16.4" text-anchor="middle" font-size="9" font-weight="800" fill="currentColor">10</text>
+            </svg>
+          </button>
+          <span class="tlabel">10초 뒤로</span>
+        </div>
+
+        <div class="tslot">
+          <button id="playBtn" class="round big" title="재생 / 일시정지">▶</button>
+          <span class="tlabel">재생 / 정지</span>
+        </div>
+
+        <div class="tslot">
+          <button id="fwdBtn" class="round" title="10초 앞으로" aria-label="10초 앞으로">
+            <svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true">
+              <g transform="translate(24,0) scale(-1,1)">
+                <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" fill="currentColor"/>
+              </g>
+              <text x="12" y="16.4" text-anchor="middle" font-size="9" font-weight="800" fill="currentColor">10</text>
+            </svg>
+          </button>
+          <span class="tlabel">10초 앞으로</span>
+        </div>
+      </div>
+      <p class="hintline">← → 키로도 10초씩 이동 · 스페이스바 재생/정지</p>
+
+      <div class="control">
+        <label for="speed">속도</label>
+        <input type="range" id="speed" min="40" max="120" step="5" value="100" />
+        <span class="value" id="speedValue">100%</span>
+      </div>
+
+      <div class="control">
+        <label for="metronome">메트로놈</label>
+        <select id="metronome" class="mini">
+          <option value="0" selected>끔</option>
+          <option value="1">인 1</option>
+          <option value="2">인 2</option>
+          <option value="3">인 3</option>
+          <option value="4">인 4</option>
+          <option value="6">인 6</option>
+        </select>
+        <span class="value" id="metroNote">꺼짐</span>
+      </div>
+
+      <div class="control" id="celloRow" hidden>
+        <label for="includeCello">첼로 포함</label>
+        <input type="checkbox" id="includeCello" />
+        <span class="value" id="celloNote"></span>
+      </div>
+
+      <div class="control">
+        <label for="octaveDown">실음 8vb</label>
+        <input type="checkbox" id="octaveDown" />
+        <span class="value">한 옥타브 ↓</span>
+      </div>
+
+      <div class="buttons">
+        <button id="wavBtn">⬇ WAV 저장</button>
+      </div>
+    </section>
+
+    </div><!-- /practiceTab -->
+
+    <p class="status" id="status"></p>
+
+    <!-- ── 새 곡 추가 (MIDI / MusicXML) ── -->
+    <p class="upnote">새 곡은 내 컴퓨터에서 추가한 뒤 다시 배포하면 반영돼요.</p>
+  </main>
+
+  <script>window.STATIC_MODE=true;</script>
+  <script src="app.js"></script>
+</body>
+</html>
