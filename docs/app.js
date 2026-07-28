@@ -203,6 +203,11 @@ async function saveYouTube() {
 async function selectPiece(id) {
   stop();
   clearLoop();
+  // 이전 곡의 재생 스케줄을 반드시 버린다.
+  // 안 버리면 곡을 바꿔도 예전 곡이 그대로 흘러나온다.
+  if (notePart) { notePart.dispose(); notePart = null; }
+  if (clickPart) { clickPart.dispose(); clickPart = null; }
+  Tone.Transport.cancel();
   currentPieceId = id;
   savePrefs();
   if (!id) { player.hidden = true; origWrap.hidden = true; infoEl.textContent = ""; return; }
