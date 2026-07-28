@@ -259,6 +259,24 @@ def _segment(part, first, last, expand=True):
     return _notes_from(seg), _raw_tempo_marks(seg), float(seg.flatten().highestTime)
 
 
+def octave_fix(tracks, chosen_index: int, notes):
+    """콘트라베이스가 '실제 울리는 높이'로 적힌 악보를 '악보에 적힌 높이'로 맞춘다.
+
+    파일마다 관행이 달라서, 어떤 악보는 콘트라베이스를 첼로와 같은 높이로 적고(기보 높이,
+    실제로는 한 옥타브 아래로 울림) 어떤 악보는 이미 한 옥타브 내려 적어 둔다.
+    그대로 두면 곡마다 '실음 8vb' 옵션이 다르게 동작하므로, 첼로보다 정확히 한 옥타브
+    아래면 한 옥타브 올려 기준을 통일한다.
+    """
+    chosen = next((t for t in tracks if t["index"] == chosen_index), None)
+    cello = next((t for t in tracks if "violoncello" in t["name"].lower()
+                  or "celli" in t["name"].lower() or "cello" in t["name"].lower()), None)
+    if chosen and cello and (cello["median"] - chosen["median"]) == 12:
+        for n in notes:
+            n["midi"] += 12
+        return True
+    return False
+
+
 def part_to_notes(score, track_index: int):
     """선택한 파트의 (음표, 템포맵)을 실제 연주 순서로 돌려준다.
     도돌이표를 펼치고, '다 카포'가 있으면 처음~Fine 구간을 뒤에 한 번 더 붙인다."""
@@ -515,8 +533,9 @@ def score_save(payload: dict = Body(...)):
         return JSONResponse({"error": "트랙을 선택해 주세요."}, status_code=400)
 
     try:
-        score, _, _, _ = analyze_parts(files[0])
+        score, _, tracks, _ = analyze_parts(files[0])
         notes, tmap = part_to_notes(score, track)
+        octave_fix(tracks, track, notes)      # 실음 기보 악보를 기보 높이로 통일
     except Exception as e:
         return JSONResponse({"error": f"트랙을 읽지 못했어요: {e}"}, status_code=422)
     if not notes:
