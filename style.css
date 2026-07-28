@@ -467,7 +467,7 @@ button.chip.ghost { color: var(--muted); }
 /* ── 옵션 행 ── */
 .control { display: flex; align-items: center; gap: 12px; margin: 11px 0; }
 .control label {
-  width: 78px; flex: 0 0 auto;
+  width: 94px; flex: 0 0 auto;   /* 'Yoon's CLAP' 처럼 긴 라벨도 한 줄에 들어가게 */
   color: var(--muted);
   font-size: 0.84rem;
   font-weight: 600;
