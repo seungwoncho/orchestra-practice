@@ -44,8 +44,12 @@ def build():
         json.dumps(index_out, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # 2) 화면 파일 복사 --------------------------------------------------
+    # 파일이 바뀌면 주소도 바뀌게 버전을 붙인다.
+    # 안 붙이면 배포해도 브라우저가 예전 style.css / app.js 를 계속 쓴다.
+    ver = max(int((BASE / n).stat().st_mtime) for n in ("style.css", "app.js"))
     html = (BASE / "index.html").read_text(encoding="utf-8")
-    html = html.replace("/static/style.css", "style.css").replace("/static/app.js", "app.js")
+    html = (html.replace("/static/style.css", f"style.css?v={ver}")
+                .replace("/static/app.js", f"app.js?v={ver}"))
     # 정적 모드 표시를 심는다
     html = html.replace("<script src=\"app.js\">",
                         "<script>window.STATIC_MODE=true;</script>\n  <script src=\"app.js\">")
