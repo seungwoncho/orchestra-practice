@@ -44,17 +44,37 @@ function parseYouTubeId(text) {
   return /^[A-Za-z0-9_-]{11}$/.test(s) ? s : null;
 }
 
+// 데이터 주소에 배포 버전을 붙인다 (새로 배포하면 브라우저가 옛 데이터를 안 쓰도록)
+const dataUrl = (path) => path + (window.DATA_VERSION ? `?v=${window.DATA_VERSION}` : "");
+
+// JSON 을 안전하게 읽는다.
+// 배포 도중에 접속하면 서버가 잠깐 오류 페이지(HTML)를 주는데, 브라우저가 그걸 캐시해
+// 계속 실패하는 일이 있다. 그래서 캐시를 건너뛰고 몇 번 다시 시도한다.
+async function getJSON(url) {
+  let lastErr;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const r = await fetch(url, attempt === 0 ? {} : { cache: "reload" });
+      const text = await r.text();
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return JSON.parse(text);
+    } catch (e) {
+      lastErr = e;
+      await new Promise((res) => setTimeout(res, 400 * (attempt + 1)));
+    }
+  }
+  throw lastErr;
+}
+
 const api = {
   async pieces() {
-    const r = await fetch(STATIC ? "data/pieces.json" : "/api/pieces");
-    const list = await r.json();
+    const list = await getJSON(STATIC ? dataUrl("data/pieces.json") : "/api/pieces");
     if (STATIC) list.forEach((p) => { p.youtube = ytStore.get(p.id) || p.youtube || null; });
     return list;
   },
   async piece(id) {
-    const r = await fetch(STATIC ? `data/${encodeURIComponent(id)}.json`
-                                 : `/api/piece/${encodeURIComponent(id)}`);
-    const d = await r.json();
+    const d = await getJSON(STATIC ? dataUrl(`data/${encodeURIComponent(id)}.json`)
+                                   : `/api/piece/${encodeURIComponent(id)}`);
     if (STATIC) d.youtube = ytStore.get(id) || d.youtube || null;
     return d;
   },

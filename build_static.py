@@ -50,9 +50,15 @@ def build():
     html = (BASE / "index.html").read_text(encoding="utf-8")
     html = (html.replace("/static/style.css", f"style.css?v={ver}")
                 .replace("/static/app.js", f"app.js?v={ver}"))
-    # 정적 모드 표시를 심는다
-    html = html.replace("<script src=\"app.js\">",
-                        "<script>window.STATIC_MODE=true;</script>\n  <script src=\"app.js\">")
+    # 정적 모드 표시와 데이터 버전을 심는다.
+    # (주소에 ?v= 가 붙어도 걸리도록 정규식으로 찾는다)
+    html, n = re.subn(
+        r'<script src="app\.js[^"]*"></script>',
+        f'<script>window.STATIC_MODE=true;window.DATA_VERSION={ver};</script>\n  '
+        f'<script src="app.js?v={ver}"></script>',
+        html)
+    if n != 1:
+        raise RuntimeError(f"app.js 스크립트 태그를 찾지 못했습니다 (일치 {n}건) — 정적 모드가 켜지지 않습니다")
     # 서버가 필요한 '새 곡 추가' 영역은 공개판에서 통째로 뺀다 (안내문도 남기지 않는다)
     html = re.sub(r'<details class="addhelp" id="addBox">.*?</details>', "", html, flags=re.S)
     (OUT / "index.html").write_text(html, encoding="utf-8")
