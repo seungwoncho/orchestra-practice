@@ -633,6 +633,17 @@ function lightBeat(i) {
 
 async function mStart() {
   await Tone.start();
+
+  // 메트로놈은 곡과 같은 타임라인을 쓴다.
+  // 곡의 재생 예약이 남아 있으면 메트로놈만 켜도 곡이 같이 울리므로 먼저 싹 비운다.
+  // (연습 탭으로 돌아가 재생을 누르면 그때 다시 만들어진다)
+  if (notePart) { notePart.dispose(); notePart = null; }
+  if (clickPart) { clickPart.dispose(); clickPart = null; }
+  Tone.Transport.cancel();
+  Tone.Transport.loop = false;          // 구간 반복 설정도 함께 해제
+  Tone.Transport.ticks = 0;
+  Tone.Transport.bpm.value = 60;        // 1박 = 1초로 두어 간격 계산을 단순하게
+
   if (mLoop) mLoop.dispose();
   mCount = 0;
   const sub = Number(mSub.value);
@@ -655,8 +666,8 @@ async function mStart() {
     mCount++;
   }, 60 / Number(mBpm.value) / sub);
 
-  Tone.Transport.start();          // 파트 재생과 공유하지만 메트로놈 루프는 독립
-  mLoop.start(0);
+  mLoop.start(0);                  // 루프를 먼저 걸고
+  Tone.Transport.start();          // 타임라인을 돌린다 (이제 메트로놈만 올라가 있다)
   mRunning = true;
   mToggle.textContent = "■ 정지";
   mToggle.classList.add("on");
