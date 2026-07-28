@@ -17,7 +17,8 @@ const INSTRUMENTS = {
   },
 };
 
-const SKIP = 10; // 앞/뒤로 건너뛸 초
+const SKIP = 10;          // 앞/뒤로 건너뛸 초
+const BASS_GAIN_DB = 9;   // 악기 기본 음량 올림 (0 = 예전 크기)
 
 // ---------- 데이터 접근 (서버 모드 / 정적 모드) ----------
 // 정적 배포판에는 파이썬 서버가 없으므로 미리 구운 JSON 을 읽고,
@@ -92,6 +93,7 @@ const pieceSel = $("piece"), infoEl = $("info"), statusEl = $("status"), player 
 const seek = $("seek"), curTime = $("curTime"), totTime = $("totTime");
 const playBtn = $("playBtn"), backBtn = $("backBtn"), fwdBtn = $("fwdBtn");
 const speedSlider = $("speed"), speedValue = $("speedValue");
+const volSlider = $("volume"), volValue = $("volumeValue");
 const metroSel = $("metronome"), metroNote = $("metroNote");
 const celloRow = $("celloRow"), includeCello = $("includeCello"), celloNote = $("celloNote");
 const octaveDown = $("octaveDown"), wavBtn = $("wavBtn");
@@ -242,14 +244,37 @@ async function selectPiece(id) {
 }
 
 // ---------- 오디오 준비 ----------
+// 악기 소리가 지나는 공통 출구.
+//   압축기 → 볼륨 → 리미터 순서.
+//   그냥 음량만 올리면 음이 겹칠 때 1.0을 넘어 찌그러진다. 압축기로 큰 소리만 눌러
+//   전체를 고르게 만든 뒤 올려야 안 깨지면서 크게 들린다.
+let masterNode = null, masterVol = null;
+function master() {
+  if (!masterNode) {
+    const limiter = new Tone.Limiter(-2).toDestination();
+    masterVol = new Tone.Volume(BASS_GAIN_DB).connect(limiter);
+    masterNode = new Tone.Compressor({
+      threshold: -24, ratio: 4, attack: 0.004, release: 0.12,
+    }).connect(masterVol);
+  }
+  return masterNode;
+}
+
+// 0~100 → 음량(dB). 100 이 기본값이고 그보다 키울 수도 있다.
+function setVolume(pct) {
+  const db = BASS_GAIN_DB + (pct - 100) * 0.28;
+  if (masterVol) masterVol.volume.value = db;
+  return db;
+}
+
 // 실제 녹음 샘플을 못 받아오면(오프라인·차단 환경) 합성음으로 대신한다
 function makeSynthBass() {
   return new Tone.PolySynth(Tone.MonoSynth, {
     oscillator: { type: "sawtooth" },
     envelope: { attack: 0.02, decay: 0.25, sustain: 0.55, release: 0.5 },
     filterEnvelope: { attack: 0.02, decay: 0.3, sustain: 0.4, baseFrequency: 110, octaves: 2.4 },
-    volume: -6,
-  }).toDestination();
+    volume: -3,
+  }).connect(master());     // 음량 조절은 마스터가 맡는다
 }
 
 async function ensureSampler(key) {
@@ -265,7 +290,9 @@ async function ensureSampler(key) {
     return;
   }
   try {
-    sampler = new Tone.Sampler({ urls: inst.urls, baseUrl: inst.baseUrl, release: 0.6 }).toDestination();
+    sampler = new Tone.Sampler({
+      urls: inst.urls, baseUrl: inst.baseUrl, release: 0.6,
+    }).connect(master());
     await Promise.race([
       Tone.loaded(),
       new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 12000)),
@@ -432,9 +459,22 @@ async function downloadWav() {
   try {
     const useSynth = window.NO_EXTERNAL || !inst.baseUrl;
     const buffer = await Tone.Offline(async () => {
+      // 재생할 때와 같은 소리 다듬기(압축 → 음량 → 리미터)를 거쳐 내보낸다
+      const lim = new Tone.Limiter(-2).toDestination();
+      const vol = new Tone.Volume(BASS_GAIN_DB).connect(lim);
+      const comp = new Tone.Compressor({
+        threshold: -24, ratio: 4, attack: 0.004, release: 0.12,
+      }).connect(vol);
       const s = useSynth
-        ? makeSynthBass()
-        : new Tone.Sampler({ urls: inst.urls, baseUrl: inst.baseUrl, release: 0.6 }).toDestination();
+        ? new Tone.PolySynth(Tone.MonoSynth, {
+            oscillator: { type: "sawtooth" },
+            envelope: { attack: 0.02, decay: 0.25, sustain: 0.55, release: 0.5 },
+            filterEnvelope: { attack: 0.02, decay: 0.3, sustain: 0.4, baseFrequency: 110, octaves: 2.4 },
+            volume: -3,
+          }).connect(comp)
+        : new Tone.Sampler({
+            urls: inst.urls, baseUrl: inst.baseUrl, release: 0.6,
+          }).connect(comp);
       if (!useSynth) await Tone.loaded();
       ns.forEach((n) => s.triggerAttackRelease(midiToNote(n.midi), n.dur / sp, n.sec / sp));
     }, duration / sp);
@@ -686,6 +726,7 @@ const readPrefs = () => { try { return JSON.parse(localStorage.getItem(PREF_KEY)
 function savePrefs() {
   localStorage.setItem(PREF_KEY, JSON.stringify({
     piece: currentPieceId,
+    volume: volSlider.value,
     speed: speedSlider.value,
     metro: metroSel.value,
     cello: includeCello.checked,
@@ -699,6 +740,9 @@ function savePrefs() {
 
 function applyPrefs() {
   const p = readPrefs();
+  if (p.volume) { volSlider.value = p.volume; volValue.textContent = p.volume + "%"; }
+  paint(volSlider);
+  setVolume(Number(volSlider.value));
   if (p.speed) { speedSlider.value = p.speed; speedValue.textContent = p.speed + "%"; paint(speedSlider); }
   if (p.metro) { metroSel.value = p.metro; metroSel.dispatchEvent(new Event("change")); }
   if (p.cello) includeCello.checked = true;
@@ -710,7 +754,7 @@ function applyPrefs() {
   return p.piece || null;
 }
 
-[speedSlider, metroSel, includeCello, octaveDown, countIn, mBpm, mBeatSel, mSub]
+[volSlider, speedSlider, metroSel, includeCello, octaveDown, countIn, mBpm, mBeatSel, mSub]
   .forEach((el) => el.addEventListener("change", savePrefs));
 
 // ---------- 이벤트 ----------
@@ -740,6 +784,12 @@ seek.addEventListener("input", () => {
   paint(seek);
 });
 seek.addEventListener("change", () => { seekTo(Number(seek.value)); seeking = false; });
+
+volSlider.addEventListener("input", (e) => {
+  volValue.textContent = e.target.value + "%";
+  paint(volSlider);
+  setVolume(Number(e.target.value));
+});
 
 speedSlider.addEventListener("input", (e) => {
   speedValue.textContent = e.target.value + "%";

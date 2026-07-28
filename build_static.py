@@ -49,10 +49,8 @@ def build():
     # 정적 모드 표시를 심는다
     html = html.replace("<script src=\"app.js\">",
                         "<script>window.STATIC_MODE=true;</script>\n  <script src=\"app.js\">")
-    # 서버가 필요한 '새 곡 추가' 영역은 정적판에서 감춘다
-    html = re.sub(r'<details class="addhelp" id="addBox">.*?</details>',
-                  '<p class="upnote">새 곡은 내 컴퓨터에서 추가한 뒤 다시 배포하면 반영돼요.</p>',
-                  html, flags=re.S)
+    # 서버가 필요한 '새 곡 추가' 영역은 공개판에서 통째로 뺀다 (안내문도 남기지 않는다)
+    html = re.sub(r'<details class="addhelp" id="addBox">.*?</details>', "", html, flags=re.S)
     (OUT / "index.html").write_text(html, encoding="utf-8")
 
     for name in ("style.css", "app.js"):

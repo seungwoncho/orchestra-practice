@@ -44,10 +44,8 @@ def build():
     css = (BASE / "style.css").read_text(encoding="utf-8")
     js = (BASE / "app.js").read_text(encoding="utf-8")
 
-    # 서버가 필요한 '새 곡 추가' 영역 제거
-    html = re.sub(r'<details class="addhelp" id="addBox">.*?</details>',
-                  '<p class="upnote">곡 추가는 내 컴퓨터 버전에서 할 수 있어요.</p>',
-                  html, flags=re.S)
+    # 서버가 필요한 '새 곡 추가' 영역 제거 (안내문도 남기지 않는다)
+    html = re.sub(r'<details class="addhelp" id="addBox">.*?</details>', "", html, flags=re.S)
     # <head> 의 외부 링크 제거 후 본문만 사용
     body = re.search(r"<body>(.*)</body>", html, re.S).group(1)
     body = re.sub(r'<script src="[^"]*app\.js[^"]*"></script>', "", body)

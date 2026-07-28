@@ -140,6 +140,12 @@
       </div>
 
       <div class="control">
+        <label for="volume">음량</label>
+        <input type="range" id="volume" min="40" max="150" step="5" value="100" />
+        <span class="value" id="volumeValue">100%</span>
+      </div>
+
+      <div class="control">
         <label for="speed">속도</label>
         <input type="range" id="speed" min="40" max="120" step="5" value="100" />
         <span class="value" id="speedValue">100%</span>
@@ -186,7 +192,7 @@
     <p class="status" id="status"></p>
 
     <!-- ── 새 곡 추가 (MIDI / MusicXML) ── -->
-    <p class="upnote">새 곡은 내 컴퓨터에서 추가한 뒤 다시 배포하면 반영돼요.</p>
+    
   </main>
 
   <script>window.STATIC_MODE=true;</script>
