@@ -302,7 +302,43 @@ function makeSynthBass() {
   }).connect(master());     // 음량 조절은 마스터가 맡는다
 }
 
+// ---------- 모바일 오디오 잠금 해제 ----------
+// 휴대폰 브라우저는 화면을 만지기 전에는 소리를 못 내게 막아 둔다.
+// 게다가 아이폰은 웹 오디오를 '벨소리'로 취급해서, 무음 스위치가 켜져 있으면 들리지 않는다.
+// → 첫 입력에서 오디오를 깨우고, '재생용 소리'로 분류해 무음 스위치의 영향을 없앤다.
+let audioUnlocked = false;
+
+function unlockAudio() {
+  try {
+    if (navigator.audioSession) navigator.audioSession.type = "playback";  // 아이폰 무음 스위치 대응
+  } catch (e) { /* 지원 안 하는 브라우저는 넘어간다 */ }
+  try {
+    const ctx = Tone.getContext().rawContext;
+    if (ctx.state !== "running") ctx.resume();
+    Tone.start();
+    audioUnlocked = ctx.state === "running";
+  } catch (e) { /* 아직이면 다음 입력 때 다시 시도 */ }
+}
+
+// 소리가 여전히 막혀 있으면 사용자에게 알려준다 (아이폰 무음 스위치가 가장 흔한 원인)
+function warnIfMuted() {
+  try {
+    if (Tone.getContext().rawContext.state !== "running") {
+      setStatus("소리가 잠겨 있어요. 화면을 한 번 누르고, 아이폰이면 옆면 무음 스위치를 풀어주세요.", true);
+      return true;
+    }
+  } catch (e) { /* 확인 불가하면 넘어간다 */ }
+  return false;
+}
+
+["pointerdown", "touchstart", "click", "keydown"].forEach((ev) =>
+  document.addEventListener(ev, () => { if (!audioUnlocked) unlockAudio(); }, { passive: true }));
+
+// 화면을 다시 켜거나 앱으로 돌아오면 오디오가 잠들어 있을 수 있다
+document.addEventListener("visibilitychange", () => { if (!document.hidden) unlockAudio(); });
+
 async function ensureSampler(key) {
+  unlockAudio();
   await Tone.start();
   ready = true;
   if (loadedInstrument === key && sampler) return;
@@ -421,6 +457,7 @@ async function togglePlay() {
     return;
   }
   await ensureSampler(instrument);
+  warnIfMuted();
   if (!notePart) schedule();
   Tone.Transport.bpm.value = 60 * speed();
 
@@ -652,7 +689,9 @@ function lightBeat(i) {
 }
 
 async function mStart() {
+  unlockAudio();
   await Tone.start();
+  warnIfMuted();
 
   // 메트로놈은 곡과 같은 타임라인을 쓴다.
   // 곡의 재생 예약이 남아 있으면 메트로놈만 켜도 곡이 같이 울리므로 먼저 싹 비운다.
