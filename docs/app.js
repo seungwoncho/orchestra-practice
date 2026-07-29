@@ -137,12 +137,16 @@ function finishBroadcast() {
   broadcastBtn.classList.remove("on");
   broadcastBtn.setAttribute("aria-pressed", "false");
   broadcastBtn.innerHTML = '<span aria-hidden="true">📢</span> TEST 사전방송';
+  broadcastMessage.hidden = true;
+  broadcastMessage.textContent = "";
 }
 
 function finishScold() {
   scoldUtterance = null;
   scoldBtn.classList.remove("on");
   scoldBtn.setAttribute("aria-pressed", "false");
+  scoldMessage.hidden = true;
+  scoldMessage.textContent = "";
 }
 
 function chooseKoreanVoice(voices) {
