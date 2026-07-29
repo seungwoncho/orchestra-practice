@@ -72,6 +72,12 @@
 
     <!-- ═══ 파트 연습 ═══ -->
     <div id="practiceTab" role="tabpanel" aria-labelledby="practiceTabButton">
+    <div class="prebroadcast">
+      <button id="broadcastBtn" type="button" aria-controls="broadcastMessage" aria-pressed="false">
+        <span aria-hidden="true">📢</span> TEST 사전방송
+      </button>
+      <p id="broadcastMessage" class="broadcast-message" aria-live="polite" hidden></p>
+    </div>
     <!-- 곡 선택 -->
     <label class="field">
       <span>곡</span>

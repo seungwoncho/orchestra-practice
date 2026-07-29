@@ -145,6 +145,38 @@ h1 {
 h1 span { color: var(--ink); font-weight: 300; }
 .subtitle { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
 
+/* ── TEST 사전방송 ── */
+.prebroadcast { margin: 0 0 16px; }
+.prebroadcast button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 13px;
+  border: 1px solid var(--chip-line);
+  border-radius: 10px;
+  background: var(--chip);
+  color: var(--navy);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.prebroadcast button:hover { background: var(--hover); border-color: var(--navy-300); }
+.prebroadcast button.on {
+  background: var(--navy-600);
+  border-color: var(--navy-600);
+  color: #fff;
+}
+.broadcast-message {
+  margin: 11px 0 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--navy-600);
+  border-radius: 0 8px 8px 0;
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.65;
+}
+
 /* ── 탭 ── */
 .tabs {
   display: flex;
@@ -611,6 +643,7 @@ button.primary.on:hover { background: #973526; }
   .head { padding-bottom: 17px; margin-bottom: 18px; }
   h1 { font-size: 1.7rem; }
   .subtitle { overflow-wrap: anywhere; }
+  .prebroadcast button { width: 100%; justify-content: center; min-height: 44px; }
   .tabs { width: 100%; }
   .tab { min-width: 0; padding-inline: 6px; }
   .field, .field select, #practiceTab, #metroTab, #player { min-width: 0; width: 100%; }

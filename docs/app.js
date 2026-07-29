@@ -125,6 +125,50 @@ const scoreFile = $("scoreFile"), analyzeBtn = $("analyzeBtn"), trackBox = $("tr
 const trackList = $("trackList"), trackHint = $("trackHint");
 const newTitle = $("newTitle"), newCategory = $("newCategory"), saveScoreBtn = $("saveScoreBtn");
 const metroStatus = $("metroStatus");
+const broadcastBtn = $("broadcastBtn"), broadcastMessage = $("broadcastMessage");
+
+const BROADCAST_TEXT = "곧 cho's test가 시작됩니다. 마음을 가다듬고 베이스를 준비하시길 바랍니다.";
+let broadcastUtterance = null;
+
+function finishBroadcast() {
+  broadcastUtterance = null;
+  broadcastBtn.classList.remove("on");
+  broadcastBtn.setAttribute("aria-pressed", "false");
+  broadcastBtn.innerHTML = '<span aria-hidden="true">📢</span> TEST 사전방송';
+}
+
+function toggleBroadcast() {
+  broadcastMessage.textContent = BROADCAST_TEXT;
+  broadcastMessage.hidden = false;
+
+  if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
+    broadcastMessage.textContent += " (이 브라우저에서는 음성 방송을 지원하지 않아요.)";
+    return;
+  }
+
+  if (broadcastUtterance || window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    finishBroadcast();
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(BROADCAST_TEXT);
+  const voices = window.speechSynthesis.getVoices();
+  utterance.voice = voices.find((voice) => voice.lang === "ko-KR")
+    || voices.find((voice) => voice.lang.startsWith("ko"))
+    || null;
+  utterance.lang = "ko-KR";
+  utterance.rate = 0.82;
+  utterance.pitch = 0.9;
+  utterance.volume = 1;
+  utterance.onend = finishBroadcast;
+  utterance.onerror = finishBroadcast;
+  broadcastUtterance = utterance;
+  broadcastBtn.classList.add("on");
+  broadcastBtn.setAttribute("aria-pressed", "true");
+  broadcastBtn.innerHTML = '<span aria-hidden="true">■</span> 방송 중지';
+  window.speechSynthesis.speak(utterance);
+}
 
 const setStatus = (m, err) => { statusEl.textContent = m; statusEl.style.color = err ? "#c0392b" : ""; };
 const midiToNote = (m) => Tone.Frequency(m, "midi").toNote();
@@ -814,7 +858,13 @@ document.querySelectorAll(".tab").forEach((btn) => {
     const isMetro = btn.dataset.tab === "metro";
     metroTab.hidden = !isMetro;
     practiceTab.hidden = isMetro;
-    if (isMetro) { stop(); } else { mStop(); }
+    if (isMetro) {
+      stop();
+      if (broadcastUtterance || window.speechSynthesis?.speaking) {
+        window.speechSynthesis.cancel();
+        finishBroadcast();
+      }
+    } else { mStop(); }
   });
 });
 
@@ -861,6 +911,7 @@ function applyPrefs() {
 
 // ---------- 이벤트 ----------
 pieceSel.addEventListener("change", (e) => selectPiece(e.target.value));
+broadcastBtn.addEventListener("click", toggleBroadcast);
 playBtn.addEventListener("click", togglePlay);
 backBtn.addEventListener("click", () => skip(-SKIP));
 fwdBtn.addEventListener("click", () => skip(SKIP));

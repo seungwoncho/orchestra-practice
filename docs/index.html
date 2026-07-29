@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cho's TEST — 세브란스 오케스트라</title>
-  <link rel="stylesheet" href="style.css?v=1785250711" />
+  <link rel="stylesheet" href="style.css?v=1785303274" />
   <script src="https://unpkg.com/tone@14.8.49/build/Tone.js"></script>
 </head>
 <body>
@@ -72,6 +72,12 @@
 
     <!-- ═══ 파트 연습 ═══ -->
     <div id="practiceTab" role="tabpanel" aria-labelledby="practiceTabButton">
+    <div class="prebroadcast">
+      <button id="broadcastBtn" type="button" aria-controls="broadcastMessage" aria-pressed="false">
+        <span aria-hidden="true">📢</span> TEST 사전방송
+      </button>
+      <p id="broadcastMessage" class="broadcast-message" aria-live="polite" hidden></p>
+    </div>
     <!-- 곡 선택 -->
     <label class="field">
       <span>곡</span>
@@ -198,6 +204,6 @@
   </main>
 
   <script>window.STATIC_MODE=true;window.DATA_VERSION=1785228550;</script>
-  <script src="app.js?v=1785250711"></script>
+  <script src="app.js?v=1785303274"></script>
 </body>
 </html>
