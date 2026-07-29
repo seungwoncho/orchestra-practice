@@ -18,6 +18,9 @@
   --track: #dde5ef;         /* 슬라이더 홈 */
   --shadow: rgba(16, 32, 56, 0.16);
   --ring: rgba(8, 75, 143, 0.12);
+  --danger: #9d2e23;
+  --danger-line: #e7b4ac;
+  --danger-soft: #fff4f2;
   --page: linear-gradient(180deg, #f7f9fc 0%, #eef2f7 100%);
   --page-glow: radial-gradient(900px 420px at 50% -8%, #ffffff 0%, rgba(255, 255, 255, 0) 70%);
 }
@@ -40,6 +43,9 @@
     --track: #2b374a;
     --shadow: rgba(0, 0, 0, 0.5);
     --ring: rgba(74, 134, 247, 0.25);
+    --danger: #ff9c92;
+    --danger-line: #6e3936;
+    --danger-soft: #321f20;
     --page: linear-gradient(180deg, #0e141d 0%, #0a0f16 100%);
     --page-glow: radial-gradient(900px 420px at 50% -8%, #17202e 0%, rgba(23, 32, 46, 0) 70%);
   }
@@ -62,6 +68,9 @@
   --track: #2b374a;
   --shadow: rgba(0, 0, 0, 0.5);
   --ring: rgba(74, 134, 247, 0.25);
+  --danger: #ff9c92;
+  --danger-line: #6e3936;
+  --danger-soft: #321f20;
   --page: linear-gradient(180deg, #0e141d 0%, #0a0f16 100%);
   --page-glow: radial-gradient(900px 420px at 50% -8%, #17202e 0%, rgba(23, 32, 46, 0) 70%);
 }
@@ -81,6 +90,9 @@
   --track: #dde5ef;
   --shadow: rgba(16, 32, 56, 0.16);
   --ring: rgba(8, 75, 143, 0.12);
+  --danger: #9d2e23;
+  --danger-line: #e7b4ac;
+  --danger-soft: #fff4f2;
   --page: linear-gradient(180deg, #f7f9fc 0%, #eef2f7 100%);
   --page-glow: radial-gradient(900px 420px at 50% -8%, #ffffff 0%, rgba(255, 255, 255, 0) 70%);
 }
@@ -147,6 +159,12 @@ h1 span { color: var(--ink); font-weight: 300; }
 
 /* ── TEST 사전방송 ── */
 .prebroadcast { margin: 0 0 16px; }
+.prebroadcast-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
 .prebroadcast button {
   display: inline-flex;
   align-items: center;
@@ -165,6 +183,17 @@ h1 span { color: var(--ink); font-weight: 300; }
   border-color: var(--navy-600);
   color: #fff;
 }
+.prebroadcast button.scold-btn {
+  border-color: var(--danger-line);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.prebroadcast button.scold-btn:hover { border-color: var(--danger); }
+.prebroadcast button.scold-btn.on {
+  border-color: #b8392d;
+  background: #b8392d;
+  color: #fff;
+}
 .broadcast-message {
   margin: 11px 0 0;
   padding: 12px 14px;
@@ -175,6 +204,13 @@ h1 span { color: var(--ink); font-weight: 300; }
   font-size: 0.84rem;
   font-weight: 600;
   line-height: 1.65;
+}
+.scold-message {
+  margin: 10px 0 0;
+  color: var(--danger);
+  font-size: 1.45rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
 }
 
 /* ── 탭 ── */
@@ -643,7 +679,8 @@ button.primary.on:hover { background: #973526; }
   .head { padding-bottom: 17px; margin-bottom: 18px; }
   h1 { font-size: 1.7rem; }
   .subtitle { overflow-wrap: anywhere; }
-  .prebroadcast button { width: 100%; justify-content: center; min-height: 44px; }
+  .prebroadcast-actions, .prebroadcast button { width: 100%; }
+  .prebroadcast button { justify-content: center; min-height: 44px; }
   .tabs { width: 100%; }
   .tab { min-width: 0; padding-inline: 6px; }
   .field, .field select, #practiceTab, #metroTab, #player { min-width: 0; width: 100%; }

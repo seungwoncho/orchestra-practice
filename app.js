@@ -126,15 +126,23 @@ const trackList = $("trackList"), trackHint = $("trackHint");
 const newTitle = $("newTitle"), newCategory = $("newCategory"), saveScoreBtn = $("saveScoreBtn");
 const metroStatus = $("metroStatus");
 const broadcastBtn = $("broadcastBtn"), broadcastMessage = $("broadcastMessage");
+const scoldBtn = $("scoldBtn"), scoldMessage = $("scoldMessage");
 
 const BROADCAST_TEXT = "곧 cho's test가 시작됩니다. 마음을 가다듬고 베이스를 준비하시길 바랍니다.";
-let broadcastUtterance = null;
+const SCOLD_TEXT = "땡!";
+let broadcastUtterance = null, scoldUtterance = null;
 
 function finishBroadcast() {
   broadcastUtterance = null;
   broadcastBtn.classList.remove("on");
   broadcastBtn.setAttribute("aria-pressed", "false");
   broadcastBtn.innerHTML = '<span aria-hidden="true">📢</span> TEST 사전방송';
+}
+
+function finishScold() {
+  scoldUtterance = null;
+  scoldBtn.classList.remove("on");
+  scoldBtn.setAttribute("aria-pressed", "false");
 }
 
 function chooseKoreanVoice(voices) {
@@ -156,6 +164,25 @@ function chooseKoreanVoice(voices) {
   return korean.find((voice) => !novelty.test(voice.name)) || korean[0] || null;
 }
 
+function chooseMaleKoreanVoice(voices) {
+  const korean = voices.filter((voice) =>
+    (voice.lang || "").replace("_", "-").toLowerCase().startsWith("ko"));
+  const preferred = [
+    /microsoft.*injoon.*natural/i,
+    /microsoft.*injoon/i,
+    /google.*(한국|korean).*male/i,
+    /^(injoon|junwoo|hyunsu|minsu)/i,
+    /^(eddy|reed|rocko|grandpa)/i,
+  ];
+  for (const pattern of preferred) {
+    const match = korean.find((voice) => pattern.test(voice.name));
+    if (match) return match;
+  }
+  return korean.find((voice) => !/(yuna|sunhi|sandy|shelley|flo|grandma)/i.test(voice.name))
+    || korean[0]
+    || null;
+}
+
 function toggleBroadcast() {
   broadcastMessage.textContent = BROADCAST_TEXT;
   broadcastMessage.hidden = false;
@@ -165,10 +192,14 @@ function toggleBroadcast() {
     return;
   }
 
-  if (broadcastUtterance || window.speechSynthesis.speaking) {
+  if (broadcastUtterance) {
     window.speechSynthesis.cancel();
     finishBroadcast();
     return;
+  }
+  if (scoldUtterance || window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    finishScold();
   }
 
   const utterance = new SpeechSynthesisUtterance(BROADCAST_TEXT);
@@ -184,6 +215,39 @@ function toggleBroadcast() {
   broadcastBtn.classList.add("on");
   broadcastBtn.setAttribute("aria-pressed", "true");
   broadcastBtn.innerHTML = '<span aria-hidden="true">■</span> 방송 중지';
+  window.speechSynthesis.speak(utterance);
+}
+
+function playScold() {
+  scoldMessage.textContent = SCOLD_TEXT;
+  scoldMessage.hidden = false;
+
+  if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
+    scoldMessage.textContent += " (이 브라우저에서는 음성을 지원하지 않아요.)";
+    return;
+  }
+
+  if (scoldUtterance) {
+    window.speechSynthesis.cancel();
+    finishScold();
+    return;
+  }
+  if (broadcastUtterance || window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    finishBroadcast();
+  }
+
+  const utterance = new SpeechSynthesisUtterance(SCOLD_TEXT);
+  utterance.voice = chooseMaleKoreanVoice(window.speechSynthesis.getVoices());
+  utterance.lang = "ko-KR";
+  utterance.rate = 0.78;
+  utterance.pitch = 0.65;
+  utterance.volume = 1;
+  utterance.onend = finishScold;
+  utterance.onerror = finishScold;
+  scoldUtterance = utterance;
+  scoldBtn.classList.add("on");
+  scoldBtn.setAttribute("aria-pressed", "true");
   window.speechSynthesis.speak(utterance);
 }
 
@@ -877,9 +941,10 @@ document.querySelectorAll(".tab").forEach((btn) => {
     practiceTab.hidden = isMetro;
     if (isMetro) {
       stop();
-      if (broadcastUtterance || window.speechSynthesis?.speaking) {
+      if (broadcastUtterance || scoldUtterance || window.speechSynthesis?.speaking) {
         window.speechSynthesis.cancel();
         finishBroadcast();
+        finishScold();
       }
     } else { mStop(); }
   });
@@ -929,6 +994,7 @@ function applyPrefs() {
 // ---------- 이벤트 ----------
 pieceSel.addEventListener("change", (e) => selectPiece(e.target.value));
 broadcastBtn.addEventListener("click", toggleBroadcast);
+scoldBtn.addEventListener("click", playScold);
 playBtn.addEventListener("click", togglePlay);
 backBtn.addEventListener("click", () => skip(-SKIP));
 fwdBtn.addEventListener("click", () => skip(SKIP));
