@@ -137,6 +137,25 @@ function finishBroadcast() {
   broadcastBtn.innerHTML = '<span aria-hidden="true">📢</span> TEST 사전방송';
 }
 
+function chooseKoreanVoice(voices) {
+  const korean = voices.filter((voice) =>
+    (voice.lang || "").replace("_", "-").toLowerCase().startsWith("ko"));
+  const preferred = [
+    /microsoft.*(sunhi|injoon).*natural/i,
+    /(premium|enhanced)/i,
+    /google.*(한국|korean)/i,
+    /^yuna$/i,
+    /siri/i,
+  ];
+  for (const pattern of preferred) {
+    const match = korean.find((voice) => pattern.test(voice.name));
+    if (match) return match;
+  }
+  // macOS의 캐릭터 음성은 안내방송에 어울리지 않아 기본 후보에서 제외한다.
+  const novelty = /^(eddy|flo|grandma|grandpa|reed|rocko|sandy|shelley)/i;
+  return korean.find((voice) => !novelty.test(voice.name)) || korean[0] || null;
+}
+
 function toggleBroadcast() {
   broadcastMessage.textContent = BROADCAST_TEXT;
   broadcastMessage.hidden = false;
@@ -154,12 +173,10 @@ function toggleBroadcast() {
 
   const utterance = new SpeechSynthesisUtterance(BROADCAST_TEXT);
   const voices = window.speechSynthesis.getVoices();
-  utterance.voice = voices.find((voice) => voice.lang === "ko-KR")
-    || voices.find((voice) => voice.lang.startsWith("ko"))
-    || null;
+  utterance.voice = chooseKoreanVoice(voices);
   utterance.lang = "ko-KR";
-  utterance.rate = 0.82;
-  utterance.pitch = 0.9;
+  utterance.rate = 0.94;
+  utterance.pitch = 1;
   utterance.volume = 1;
   utterance.onend = finishBroadcast;
   utterance.onerror = finishBroadcast;
