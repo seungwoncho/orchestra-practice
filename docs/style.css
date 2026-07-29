@@ -492,6 +492,24 @@ button.round.big {
 }
 button.round.big:hover { background: var(--navy); }
 
+/* ── 앞부분 긴 쉼표 안내 ── */
+.restnotice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 13px;
+  margin-bottom: 14px;
+  background: var(--soft);
+  border: 1px solid var(--navy-300);
+  border-radius: 11px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+.restnotice > span { flex: 1; min-width: 0; }
+.restnotice button { flex: 0 0 auto; }
+
 /* ── 구간 반복 ── */
 .loopbar {
   display: flex;

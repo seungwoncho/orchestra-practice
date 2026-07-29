@@ -126,6 +126,7 @@ const scoreFile = $("scoreFile"), analyzeBtn = $("analyzeBtn"), trackBox = $("tr
 const trackList = $("trackList"), trackHint = $("trackHint");
 const newTitle = $("newTitle"), newCategory = $("newCategory"), saveScoreBtn = $("saveScoreBtn");
 const metroStatus = $("metroStatus");
+const restNotice = $("restNotice"), restText = $("restText"), toFirstNoteBtn = $("toFirstNote");
 const broadcastBtn = $("broadcastBtn"), broadcastMessage = $("broadcastMessage");
 const scoldBtn = $("scoldBtn"), scoldMessage = $("scoldMessage");
 
@@ -400,6 +401,7 @@ async function selectPiece(id) {
     setStatus("악기 음색 불러오는 중…");
     const soundMode = await ensureSampler(instrument);
     const firstNoteHint = firstNoteAt >= 2 ? `첫 음표는 ${fmt(firstNoteAt)}부터 시작해요.` : "";
+    updateRestNotice();
     setStatus(soundMode === "synth"
       ? `악기 샘플을 불러오지 못해 합성음으로 준비했어요.${firstNoteHint ? ` ${firstNoteHint}` : ""}`
       : firstNoteHint ? `준비 완료 — ${firstNoteHint}` : "준비 완료 — ▶ 를 눌러보세요.");
@@ -542,6 +544,25 @@ function schedule() {
     if (n > 0) getClick().triggerAttackRelease(ev.i % n === 0 ? "G5" : "C5", "32n", time);
   }, beatGrid.map((sec, i) => ({ time: Math.round(sec * ppq) + "i", i })));
   clickPart.start(0);
+}
+
+// ---------- 곡 앞부분의 긴 쉼표 안내 ----------
+// 협주곡 2악장처럼 베이스가 한참 쉬는 곡은, 0:00에서 재생하면 아무 소리도 안 나서
+// 앱이 고장 난 것처럼 보인다. 그래서 첫 음표 위치를 알려주고 바로 건너뛸 수 있게 한다.
+const REST_NOTICE_MIN = 5;   // 이 초 이상 쉬면 안내를 띄운다
+
+function updateRestNotice() {
+  if (!restNotice) return;
+  const show = firstNoteAt >= REST_NOTICE_MIN;
+  restNotice.hidden = !show;
+  if (show) {
+    restText.textContent = `이 곡은 ${fmt(firstNoteAt)}까지 베이스가 쉬어요.`;
+    toFirstNoteBtn.textContent = `${fmt(firstNoteAt)} 로 건너뛰기`;
+  }
+}
+
+function goToFirstNote() {
+  seekTo(Math.max(0, firstNoteAt - 2));   // 들어가는 박을 느낄 수 있게 2초 앞에서
 }
 
 // ---------- 구간 반복 ----------
@@ -1020,6 +1041,7 @@ if (saveScoreBtn) saveScoreBtn.addEventListener("click", saveScore);
 loopABtn.addEventListener("click", setLoopA);
 loopBBtn.addEventListener("click", setLoopB);
 loopClearBtn.addEventListener("click", clearLoop);
+if (toFirstNoteBtn) toFirstNoteBtn.addEventListener("click", goToFirstNote);
 
 ytSave.addEventListener("click", saveYouTube);
 ytUrl.addEventListener("keydown", (e) => { if (e.key === "Enter") saveYouTube(); });

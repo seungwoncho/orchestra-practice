@@ -145,6 +145,12 @@
       </div>
       <p class="hintline">← → 키로도 10초씩 이동 · 스페이스바 재생/정지</p>
 
+      <!-- 곡 앞부분에서 베이스가 길게 쉬는 곡은, 첫 음표로 바로 건너뛸 수 있게 -->
+      <div class="restnotice" id="restNotice" hidden>
+        <span id="restText"></span>
+        <button id="toFirstNote" class="chip">첫 음표로</button>
+      </div>
+
       <!-- 구간 반복 (어려운 부분만 돌려 연습) -->
       <div class="loopbar">
         <span class="looplabel">구간 반복</span>
