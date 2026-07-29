@@ -99,6 +99,7 @@ const api = {
 let notes = [];        // [{midi, sec, dur, role}]
 let beatGrid = [];     // 메트로놈용 박 위치(초)
 let duration = 0;      // 전체 길이(초, 정상 속도)
+let firstNoteAt = 0;   // 첫 콘트라베이스 음표 위치(긴 쉼표 안내용)
 let instrument = "contrabass";
 let sampler = null, loadedInstrument = null, loadedSoundMode = null, clickSynth = null;
 let notePart = null, clickPart = null;
@@ -370,6 +371,9 @@ async function selectPiece(id) {
     notes = d.notes;
     beatGrid = d.beats || [];
     duration = d.duration || 0;
+    firstNoteAt = notes.reduce((min, note) =>
+      note.role === "bass" ? Math.min(min, Number(note.sec) || 0) : min, Infinity);
+    if (!Number.isFinite(firstNoteAt)) firstNoteAt = 0;
     instrument = d.instrument || "contrabass";
 
     const extra = [];
@@ -395,9 +399,10 @@ async function selectPiece(id) {
 
     setStatus("악기 음색 불러오는 중…");
     const soundMode = await ensureSampler(instrument);
+    const firstNoteHint = firstNoteAt >= 2 ? `첫 음표는 ${fmt(firstNoteAt)}부터 시작해요.` : "";
     setStatus(soundMode === "synth"
-      ? "악기 샘플을 불러오지 못해 합성음으로 준비했어요."
-      : "준비 완료 — ▶ 를 눌러보세요.");
+      ? `악기 샘플을 불러오지 못해 합성음으로 준비했어요.${firstNoteHint ? ` ${firstNoteHint}` : ""}`
+      : firstNoteHint ? `준비 완료 — ${firstNoteHint}` : "준비 완료 — ▶ 를 눌러보세요.");
   } catch (e) {
     setStatus("곡을 불러오지 못했어요: " + e.message, true);
   } finally {
@@ -476,8 +481,6 @@ function warnIfMuted() {
 document.addEventListener("visibilitychange", () => { if (!document.hidden) unlockAudio(); });
 
 async function ensureSampler(key) {
-  unlockAudio();
-  await Tone.start();
   if (loadedInstrument === key && sampler) { ready = true; return loadedSoundMode || "sample"; }
   if (sampler) sampler.dispose();
 
@@ -602,6 +605,11 @@ async function togglePlay() {
     setStatus(`일시정지 · ${fmt(position())}`);
     return;
   }
+  // AudioContext 시작은 반드시 사용자가 재생 버튼을 누른 순간에 요청해야 한다.
+  // 곡을 자동으로 불러오는 중에 Tone.start()를 기다리면 브라우저가 차단해
+  // 로딩 상태와 비활성 재생 버튼에서 영원히 멈출 수 있다.
+  unlockAudio();
+  await Tone.start();
   await ensureSampler(instrument);
   warnIfMuted();
   if (!notePart) schedule();
@@ -628,7 +636,9 @@ async function togglePlay() {
   playBtn.textContent = "❚❚";
   playBtn.title = "일시정지";
   playBtn.setAttribute("aria-label", "일시정지");
-  setStatus(`재생 중 · ${speedSlider.value}% 속도`);
+  setStatus(position() < firstNoteAt - 0.5
+    ? `재생 중 · 첫 음표는 ${fmt(firstNoteAt)}부터 시작해요.`
+    : `재생 중 · ${speedSlider.value}% 속도`);
 }
 
 function stop() {
