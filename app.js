@@ -100,7 +100,7 @@ let notes = [];        // [{midi, sec, dur, role}]
 let beatGrid = [];     // 메트로놈용 박 위치(초)
 let duration = 0;      // 전체 길이(초, 정상 속도)
 let instrument = "contrabass";
-let sampler = null, loadedInstrument = null, clickSynth = null;
+let sampler = null, loadedInstrument = null, loadedSoundMode = null, clickSynth = null;
 let notePart = null, clickPart = null;
 let seeking = false, ready = false;
 let currentPieceId = null;
@@ -124,6 +124,7 @@ const ytUrl = $("ytUrl"), ytSave = $("ytSave"), ytEdit = $("ytEdit");
 const scoreFile = $("scoreFile"), analyzeBtn = $("analyzeBtn"), trackBox = $("trackBox");
 const trackList = $("trackList"), trackHint = $("trackHint");
 const newTitle = $("newTitle"), newCategory = $("newCategory"), saveScoreBtn = $("saveScoreBtn");
+const metroStatus = $("metroStatus");
 
 const setStatus = (m, err) => { statusEl.textContent = m; statusEl.style.color = err ? "#c0392b" : ""; };
 const midiToNote = (m) => Tone.Frequency(m, "midi").toNote();
@@ -230,7 +231,10 @@ async function selectPiece(id) {
   Tone.Transport.cancel();
   currentPieceId = id;
   savePrefs();
-  if (!id) { player.hidden = true; origWrap.hidden = true; infoEl.textContent = ""; return; }
+  if (!id) { player.hidden = true; origWrap.hidden = true; infoEl.textContent = ""; ready = false; return; }
+  ready = false;
+  playBtn.disabled = true;
+  wavBtn.disabled = true;
   setStatus("불러오는 중…");
   try {
     const d = await api.piece(id);
@@ -261,10 +265,15 @@ async function selectPiece(id) {
     paint(seek); paint(speedSlider);
 
     setStatus("악기 음색 불러오는 중…");
-    await ensureSampler(instrument);
-    setStatus("준비 완료 — ▶ 를 눌러보세요.");
+    const soundMode = await ensureSampler(instrument);
+    setStatus(soundMode === "synth"
+      ? "악기 샘플을 불러오지 못해 합성음으로 준비했어요."
+      : "준비 완료 — ▶ 를 눌러보세요.");
   } catch (e) {
     setStatus("곡을 불러오지 못했어요: " + e.message, true);
+  } finally {
+    playBtn.disabled = !ready;
+    wavBtn.disabled = !ready;
   }
 }
 
@@ -340,16 +349,18 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) unlo
 async function ensureSampler(key) {
   unlockAudio();
   await Tone.start();
-  ready = true;
-  if (loadedInstrument === key && sampler) return;
+  if (loadedInstrument === key && sampler) { ready = true; return loadedSoundMode || "sample"; }
   if (sampler) sampler.dispose();
 
   const inst = INSTRUMENTS[key];
   if (window.NO_EXTERNAL || !inst.baseUrl) {   // 외부 접속이 막힌 배포판
     sampler = makeSynthBass();
     loadedInstrument = key;
-    return;
+    loadedSoundMode = "synth";
+    ready = true;
+    return "synth";
   }
+  let mode = "sample";
   try {
     sampler = new Tone.Sampler({
       urls: inst.urls, baseUrl: inst.baseUrl, release: 0.6,
@@ -361,9 +372,12 @@ async function ensureSampler(key) {
   } catch (e) {
     if (sampler) sampler.dispose();
     sampler = makeSynthBass();                 // 샘플 실패 → 합성음으로 계속 진행
-    setStatus("악기 샘플을 못 받아와 합성음으로 재생해요.");
+    mode = "synth";
   }
   loadedInstrument = key;
+  loadedSoundMode = mode;
+  ready = true;
+  return mode;
 }
 
 function getClick() {
@@ -454,6 +468,9 @@ async function togglePlay() {
   if (Tone.Transport.state === "started") {
     Tone.Transport.pause();
     playBtn.textContent = "▶";
+    playBtn.title = "재생";
+    playBtn.setAttribute("aria-label", "재생");
+    setStatus(`일시정지 · ${fmt(position())}`);
     return;
   }
   await ensureSampler(instrument);
@@ -480,12 +497,17 @@ async function togglePlay() {
     Tone.Transport.start();
   }
   playBtn.textContent = "❚❚";
+  playBtn.title = "일시정지";
+  playBtn.setAttribute("aria-label", "일시정지");
+  setStatus(`재생 중 · ${speedSlider.value}% 속도`);
 }
 
 function stop() {
   Tone.Transport.stop();
   Tone.Transport.ticks = 0;
   playBtn.textContent = "▶";
+  playBtn.title = "재생";
+  playBtn.setAttribute("aria-label", "재생");
   seek.value = 0; curTime.textContent = "0:00";
   paint(seek);
 }
@@ -730,6 +752,7 @@ async function mStart() {
   mRunning = true;
   mToggle.textContent = "■ 정지";
   mToggle.classList.add("on");
+  metroStatus.textContent = `재생 중 · ${mBpm.value} BPM · ${mBeatSel.value}박자`;
 }
 
 function mStop() {
@@ -739,6 +762,7 @@ function mStop() {
   lightBeat(-1);
   mToggle.textContent = "▶ 시작";
   mToggle.classList.remove("on");
+  metroStatus.textContent = "정지됨 — ▶ 를 누르면 다시 시작해요.";
 }
 
 const mToggleRun = () => (mRunning ? mStop() : mStart());
@@ -750,6 +774,7 @@ function setBpm(v) {
   mMark.textContent = tempoWord(b);
   paint(mBpm);
   if (mLoop) mLoop.interval = 60 / b / Number(mSub.value);
+  if (mRunning) metroStatus.textContent = `재생 중 · ${b} BPM · ${mBeatSel.value}박자`;
 }
 
 // 탭 템포: 두드린 간격의 평균으로 BPM 계산
@@ -773,6 +798,7 @@ mBeatSel.addEventListener("change", () => {
   mBeatNote.textContent = `${mBeatSel.value}박마다 강세`;
   drawBeats();
   mCount = 0;
+  if (mRunning) metroStatus.textContent = `재생 중 · ${mBpm.value} BPM · ${mBeatSel.value}박자`;
 });
 mSub.addEventListener("change", () => {
   if (mLoop) mLoop.interval = 60 / Number(mBpm.value) / Number(mSub.value);
@@ -784,6 +810,7 @@ const practiceTab = $("practiceTab"), metroTab = $("metroTab");
 document.querySelectorAll(".tab").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b === btn));
+    document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-selected", String(b === btn)));
     const isMetro = btn.dataset.tab === "metro";
     metroTab.hidden = !isMetro;
     practiceTab.hidden = isMetro;

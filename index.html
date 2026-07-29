@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cho's TEST — 세브란스 오케스트라</title>
+  <title>파트 연습실 — 세브란스 오케스트라</title>
   <link rel="stylesheet" href="/static/style.css" />
   <script src="https://unpkg.com/tone@14.8.49/build/Tone.js"></script>
 </head>
@@ -14,26 +14,28 @@
         <span class="brand-mark">🎻</span>
         <span class="brand-name">세브란스 오케스트라</span>
       </div>
-      <h1>Cho's <span>TEST</span></h1>
+      <h1>파트 <span>연습실</span></h1>
       <p class="subtitle">올해 연주곡의 내 파트만 골라 들으며 박자 잡기</p>
     </header>
 
     <!-- 탭 -->
-    <nav class="tabs">
-      <button class="tab active" data-tab="practice">파트 연습</button>
-      <button class="tab" data-tab="metro">Yoon's CLAP</button>
+    <nav class="tabs" role="tablist" aria-label="연습 도구">
+      <button id="practiceTabButton" class="tab active" data-tab="practice" role="tab"
+        aria-selected="true" aria-controls="practiceTab">파트 연습</button>
+      <button id="metroTabButton" class="tab" data-tab="metro" role="tab"
+        aria-selected="false" aria-controls="metroTab">Yoon's CLAP</button>
     </nav>
 
     <!-- ═══ 단독 메트로놈 ═══ -->
-    <section id="metroTab" hidden>
+    <section id="metroTab" role="tabpanel" aria-labelledby="metroTabButton" hidden>
       <div class="mbig">
         <div class="mbeats" id="mBeats"></div>
         <div class="mbpm">
-          <button id="mMinus" class="mstep">−</button>
+          <button id="mMinus" class="mstep" aria-label="템포 1 BPM 낮추기">−</button>
           <div class="mbpmnum"><span id="mBpmVal">90</span><small>BPM</small></div>
-          <button id="mPlus" class="mstep">+</button>
+          <button id="mPlus" class="mstep" aria-label="템포 1 BPM 높이기">+</button>
         </div>
-        <input type="range" id="mBpm" min="30" max="240" value="90" />
+        <input type="range" id="mBpm" min="30" max="240" value="90" aria-label="템포" />
         <p class="mmark" id="mMark">Andante</p>
       </div>
 
@@ -65,10 +67,11 @@
         <button id="mTap">탭 템포</button>
       </div>
       <p class="hintline">스페이스바로 시작/정지 · T 키를 곡에 맞춰 두드리면 템포가 잡혀요</p>
+      <p class="status" id="metroStatus" aria-live="polite">준비 완료 — ▶ 를 눌러보세요.</p>
     </section>
 
     <!-- ═══ 파트 연습 ═══ -->
-    <div id="practiceTab">
+    <div id="practiceTab" role="tabpanel" aria-labelledby="practiceTabButton">
     <!-- 곡 선택 -->
     <label class="field">
       <span>곡</span>
@@ -93,7 +96,7 @@
     <!-- ── 재생 컨트롤 ── -->
     <section id="player" hidden>
       <div class="seekwrap">
-        <input type="range" id="seek" min="0" max="100" value="0" step="0.05" />
+        <input type="range" id="seek" min="0" max="100" value="0" step="0.05" aria-label="재생 위치" />
         <div class="times">
           <span id="curTime">0:00</span>
           <span id="totTime">0:00</span>
@@ -112,7 +115,7 @@
         </div>
 
         <div class="tslot">
-          <button id="playBtn" class="round big" title="재생 / 일시정지">▶</button>
+          <button id="playBtn" class="round big" title="재생" aria-label="재생">▶</button>
           <span class="tlabel">재생 / 정지</span>
         </div>
 
@@ -187,9 +190,8 @@
       </div>
     </section>
 
+    <p class="status" id="status" aria-live="polite"></p>
     </div><!-- /practiceTab -->
-
-    <p class="status" id="status"></p>
 
     <!-- ── 새 곡 추가 (MIDI / MusicXML) ── -->
     <details class="addhelp" id="addBox">

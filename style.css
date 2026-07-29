@@ -101,7 +101,9 @@ body {
 }
 
 .card {
-  width: min(500px, 100%);
+  width: 100%;
+  max-width: 500px;
+  min-width: 0;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 20px;
@@ -252,6 +254,7 @@ select {
   font-family: inherit;
   cursor: pointer;
   transition: border-color .15s, box-shadow .15s;
+  max-width: 100%;
 }
 select:hover { border-color: var(--navy-300); }
 select:focus-visible, input:focus-visible, button:focus-visible {
@@ -599,4 +602,36 @@ button.primary.on:hover { background: #973526; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+/* 작은 화면에서는 고정 폭과 3열 옵션 행이 화면을 밀어내지 않게 쌓는다. */
+@media (max-width: 560px) {
+  body { padding: 16px 10px; display: block; }
+  .card { padding: 22px 16px 20px; border-radius: 16px; overflow: hidden; }
+  .head { padding-bottom: 17px; margin-bottom: 18px; }
+  h1 { font-size: 1.7rem; }
+  .subtitle { overflow-wrap: anywhere; }
+  .tabs { width: 100%; }
+  .tab { min-width: 0; padding-inline: 6px; }
+  .field, .field select, #practiceTab, #metroTab, #player { min-width: 0; width: 100%; }
+  .field select { text-overflow: ellipsis; }
+  .transport { gap: clamp(10px, 5vw, 22px); }
+  .control {
+    display: grid;
+    grid-template-columns: minmax(78px, auto) minmax(0, 1fr);
+    gap: 7px 12px;
+    align-items: center;
+    margin: 14px 0;
+  }
+  .control label { width: auto; min-width: 0; }
+  .control input[type="range"] { min-width: 0; }
+  .control .value {
+    grid-column: 2;
+    min-width: 0;
+    margin-left: 0;
+    text-align: left;
+    white-space: normal;
+  }
+  .control select.mini { width: 100%; min-width: 0; }
+  .hintline { line-height: 1.55; }
 }
