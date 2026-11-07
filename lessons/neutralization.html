@@ -21,29 +21,28 @@
   :root:not([data-theme="light"]){
     --bg:#0f131b; --surface:#171c27; --surface-2:#202736; --ink:#e8ecf4; --ink-2:#b5bfd0; --ink-3:#8590a3;
     --line:#2c3446; --accent:#7f9cff; --accent-soft:#232d4d; --good:#4ade80; --bad:#f87171; --warn:#fbbf24;
-    --ion-w:#38bdf8; --ion-w-ink:#082f49; --ppt:#6b7486; --shadow:none;
+    --ion-w:#38bdf8; --ion-w-ink:#082f49; --ppt:#6b7486; --shadow:none; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0f131b; --surface:#171c27; --surface-2:#202736; --ink:#e8ecf4; --ink-2:#b5bfd0; --ink-3:#8590a3;
   --line:#2c3446; --accent:#7f9cff; --accent-soft:#232d4d; --good:#4ade80; --bad:#f87171; --warn:#fbbf24;
-  --ion-w:#38bdf8; --ion-w-ink:#082f49; --ppt:#6b7486; --shadow:none;
+  --ion-w:#38bdf8; --ion-w-ink:#082f49; --ppt:#6b7486; --shadow:none; color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{font-size:17px;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
-  line-height:1.7;word-break:keep-all;overflow-wrap:anywhere;
-  padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+  line-height:1.7;word-break:keep-all;overflow-wrap:anywhere}
 a{color:var(--accent)}
 sub,sup{line-height:0}
-.wrap{max-width:980px;margin:0 auto;padding:0 16px 80px}
+.wrap{max-width:980px;margin:0 auto;padding-block:0 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 
 /* top bar */
 .topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);
   -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
   padding-top:env(safe-area-inset-top)}
-.topbar-in{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:8px;padding:8px 16px}
+.topbar-in{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:8px;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .nav{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1}
 .nav::-webkit-scrollbar{display:none}
 .nav a{flex:none;text-decoration:none;color:var(--ink-2);font-weight:600;font-size:.86rem;padding:8px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);min-height:40px;display:flex;align-items:center}
@@ -224,7 +223,7 @@ details.sol[open]>summary::after{content:"접기 ▴"}
     <a href="#probs"><b>④ 기출 유형 문제</b><span>8문항 · 난이도 ★★ ~ ★★★★</span></a>
     <a href="#skills"><b>⑤ 풀이 스킬</b><span>10가지 스킬 + 5단계 풀이 루틴 + 요약표</span></a>
   </div>
-  <div class="notice">📌 <b>문항 출처 안내</b> — ④의 문항은 2015~2025년 수능·평가원 모의평가(화학Ⅰ)와 고1 학력평가(통합과학)에 반복 출제된 <b>문항 유형을 고1 심화 수준으로 재구성</b>한 것입니다. 원문항의 그림·수치를 그대로 옮긴 것이 아니므로, 수업에서 "실제 기출"로 제시하려면 EBSi·한국교육과정평가원 기출 PDF의 원문항으로 바꿔 쓰세요. 모든 수치는 풀이와 맞도록 검산해 두었습니다.</div>
+  <div class="notice"><b>문항 출처 안내</b> — ④의 문항은 2015~2025년 수능·평가원 모의평가(화학Ⅰ)와 고1 학력평가(통합과학)에 반복 출제된 <b>문항 유형을 고1 심화 수준으로 재구성</b>한 것입니다. 원문항의 그림·수치를 그대로 옮긴 것이 아니므로, 수업에서 "실제 기출"로 제시하려면 EBSi·한국교육과정평가원 기출 PDF의 원문항으로 바꿔 쓰세요. 모든 수치는 풀이와 맞도록 검산해 두었습니다.</div>
 </div>
 
 <!-- ================= ① 기초 개념 ================= -->
@@ -240,7 +239,7 @@ details.sol[open]>summary::after{content:"접기 ▴"}
     <div class="eq">HCl → H<sup>+</sup> + Cl<sup>−</sup><br>H<sub>2</sub>SO<sub>4</sub> → <b>2</b>H<sup>+</sup> + SO<sub>4</sub><sup>2−</sup><br>CH<sub>3</sub>COOH → H<sup>+</sup> + CH<sub>3</sub>COO<sup>−</sup></div>
     <div class="eq">NaOH → Na<sup>+</sup> + OH<sup>−</sup><br>KOH → K<sup>+</sup> + OH<sup>−</sup><br>Ba(OH)<sub>2</sub> → Ba<sup>2+</sup> + <b>2</b>OH<sup>−</sup></div>
   </div>
-  <div class="warnbox">⚠️ <b>가수(價數)에 주의!</b> H<sub>2</sub>SO<sub>4</sub> 1개는 H<sup>+</sup>를 <b>2개</b>, Ba(OH)<sub>2</sub> 1개는 OH<sup>−</sup>를 <b>2개</b> 내놓습니다. 심화 문제의 함정은 대부분 여기서 나옵니다.</div>
+  <div class="warnbox"><b>가수(價數)에 주의!</b> H<sub>2</sub>SO<sub>4</sub> 1개는 H<sup>+</sup>를 <b>2개</b>, Ba(OH)<sub>2</sub> 1개는 OH<sup>−</sup>를 <b>2개</b> 내놓습니다. 심화 문제의 함정은 대부분 여기서 나옵니다.</div>
   <div class="tbl-wrap"><table>
     <tr><th></th><th>산성 (H<sup>+</sup>)</th><th>염기성 (OH<sup>−</sup>)</th></tr>
     <tr><td>맛·촉감</td><td>신맛</td><td>쓴맛, 단백질을 녹여 미끈거림</td></tr>
@@ -297,7 +296,7 @@ details.sol[open]>summary::after{content:"접기 ▴"}
 </div>
 
 <div class="card">
-  <h3>✅ 개념 체크 OX <span class="muted small">(눌러서 정답 확인)</span></h3>
+  <h3>개념 체크 OX <span class="muted small">(눌러서 정답 확인)</span></h3>
   <ul class="ox" id="oxList">
     <li><div class="q">1. HCl(aq)에 NaOH(aq)을 넣으면 Cl<sup>−</sup>의 수는 줄어든다.<div class="ans"><b class="x">X</b> — Cl<sup>−</sup>은 구경꾼 이온이라 수가 일정하다. 줄어드는 것은 H<sup>+</sup>.</div></div><button class="btn">정답</button></li>
     <li><div class="q">2. 페놀프탈레인 용액이 무색이면 그 용액은 산성이다.<div class="ans"><b class="x">X</b> — 중성에서도 무색. "산성 또는 중성".</div></div><button class="btn">정답</button></li>
@@ -548,7 +547,7 @@ details.sol[open]>summary::after{content:"접기 ▴"}
       <span class="x">ㄷ X</span><span>Na<sup>+</sup> 3 : Cl<sup>−</sup> 2 = 3 : 2.</span>
     </div>
     <span class="answer">정답 ④ ㄱ, ㄴ</span>
-    <div class="extra">💬 <b>추가 발문</b> — HCl(aq) 15 mL를 완전히 중화하려면 NaOH(aq) 몇 mL가 필요할까? → H<sup>+</sup> 15<i>a</i> = 3 = 30<i>b</i> → <b>30 mL</b></div>
+    <div class="extra"><b>추가 발문</b> — HCl(aq) 15 mL를 완전히 중화하려면 NaOH(aq) 몇 mL가 필요할까? → H<sup>+</sup> 15<i>a</i> = 3 = 30<i>b</i> → <b>30 mL</b></div>
     <div class="skills-used">사용 스킬 : <a class="chip" href="#s2">S2 미지수 a, b</a><a class="chip" href="#s4">S4 전체 이온 수 패턴</a><a class="chip" href="#s3">S3 min 규칙</a></div>
   </div></details>
 </article>
@@ -579,7 +578,7 @@ details.sol[open]>summary::after{content:"접기 ▴"}
       <span class="o">ㄷ O</span><span>H<sup>+</sup> 10<i>a</i> = 15<i>b</i> &lt; OH<sup>−</sup> 40<i>b</i> → 염기성. (꼭짓점보다 오른쪽 = NaOH 과량)</span>
     </div>
     <span class="answer">정답 ④ ㄴ, ㄷ</span>
-    <div class="extra">💬 <b>추가 발문</b> — HCl(aq) 15 mL를 중화하는 NaOH(aq)의 부피는? → 15 × 1.5 = <b>22.5 mL</b></div>
+    <div class="extra"><b>추가 발문</b> — HCl(aq) 15 mL를 중화하는 NaOH(aq)의 부피는? → 15 × 1.5 = <b>22.5 mL</b></div>
     <div class="skills-used">사용 스킬 : <a class="chip" href="#s9">S9 온도 그래프</a><a class="chip" href="#s2">S2 미지수 a, b</a></div>
   </div></details>
 </article>
@@ -609,7 +608,7 @@ details.sol[open]>summary::after{content:"접기 ▴"}
       <span class="o">ㄷ O</span><span>H<sub>2</sub>SO<sub>4</sub>(aq) 3N/10 mL, Ba(OH)<sub>2</sub>(aq) 3N/20 mL → 2배.</span>
     </div>
     <span class="answer">정답 ③ ㄱ, ㄷ</span>
-    <div class="extra">💬 <b>연결 발문</b> — 이 실험에 전구 장치를 연결하면? 20 mL에서 이온이 없으므로 <b>전구가 꺼진다</b>. HCl + NaOH에서는 중화점에도 Na<sup>+</sup>, Cl<sup>−</sup>이 있어 꺼지지 않는다.</div>
+    <div class="extra"><b>연결 발문</b> — 이 실험에 전구 장치를 연결하면? 20 mL에서 이온이 없으므로 <b>전구가 꺼진다</b>. HCl + NaOH에서는 중화점에도 Na<sup>+</sup>, Cl<sup>−</sup>이 있어 꺼지지 않는다.</div>
     <div class="skills-used">사용 스킬 : <a class="chip" href="#s8">S8 가수와 앙금</a><a class="chip" href="#s4">S4 전체 이온 수 패턴</a><a class="chip" href="#s10">S10 전체 vs 단위 부피당</a></div>
   </div></details>
 </article>
@@ -678,7 +677,7 @@ details.sol[open]>summary::after{content:"접기 ▴"}
       <span class="o">ㄷ O</span><span>남은 H<sup>+</sup> 3 &gt; 남은 OH<sup>−</sup> 1 → 산성.</span>
     </div>
     <span class="answer">정답 ④ ㄱ, ㄷ</span>
-    <div class="extra">💬 <b>추가 발문</b> — HCl(aq) 15 mL를 중화하는 NaOH(aq)의 부피는? → 15 × 0.2 = 3 = 0.1 × V → <b>30 mL</b></div>
+    <div class="extra"><b>추가 발문</b> — HCl(aq) 15 mL를 중화하는 NaOH(aq)의 부피는? → 15 × 0.2 = 3 = 0.1 × V → <b>30 mL</b></div>
     <div class="skills-used">사용 스킬 : <a class="chip" href="#s2">S2 미지수 a, b</a><a class="chip" href="#s7">S7 혼합 용액끼리 섞기</a><a class="chip" href="#s3">S3 min 규칙</a></div>
   </div></details>
 </article>
@@ -690,7 +689,7 @@ details.sol[open]>summary::after{content:"접기 ▴"}
 <p class="sec-sub">위 8문항에서 반복해서 쓴 무기 10가지와, 어떤 문제든 적용하는 5단계 루틴</p>
 
 <div class="card">
-  <h3>🧭 5단계 풀이 루틴</h3>
+  <h3>5단계 풀이 루틴</h3>
   <div class="flow">
     <div class="st"><b>STEP 1</b><span>이온화식 쓰기<br><small class="muted">가수 체크 (H₂SO₄, Ba(OH)₂)</small></span></div>
     <div class="st"><b>STEP 2</b><span>미지수 놓기<br><small class="muted">1 mL당 a, b 또는 모형 개수</small></span></div>
@@ -780,7 +779,7 @@ details.sol[open]>summary::after{content:"접기 ▴"}
 </div></div>
 
 <div class="card">
-  <h3>📋 한 장 요약표</h3>
+  <h3>한 장 요약표</h3>
   <div class="tbl-wrap"><table class="cheat">
     <tr><th class="l">물어보는 것</th><th class="l">바로 떠올릴 것</th></tr>
     <tr><td class="l">액성</td><td class="l">남은 반응 이온이 H⁺면 산성, OH⁻면 염기성, 없으면 중성</td></tr>
