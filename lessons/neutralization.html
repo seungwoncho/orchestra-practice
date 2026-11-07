@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="중화반응">
+<meta name="format-detection" content="telephone=no">
+<title>중화반응 실전 문제풀이</title>
+<style>
+:root{
+  --bg:#f6f7fb; --surface:#ffffff; --surface-2:#eef1f7; --ink:#1b2333; --ink-2:#4a5568; --ink-3:#7a8699;
+  --line:#dde2ec; --accent:#3a5bd9; --accent-soft:#e6ecff; --good:#16a34a; --bad:#dc2626; --warn:#d97706;
+  --ion-h:#e5484d; --ion-oh:#2f6fe4; --ion-na:#9b51e0; --ion-cl:#16a36b; --ion-so4:#e08a00; --ion-ba:#5b6577;
+  --ion-w:#7dd3fc; --ion-w-ink:#0c4a6e; --ppt:#9aa3b2;
+  --acid:#facc15; --neutral:#4ade80; --base:#60a5fa;
+  --shadow:0 1px 2px rgba(20,30,60,.06),0 4px 16px rgba(20,30,60,.06);
+  --radius:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f131b; --surface:#171c27; --surface-2:#202736; --ink:#e8ecf4; --ink-2:#b5bfd0; --ink-3:#8590a3;
+    --line:#2c3446; --accent:#7f9cff; --accent-soft:#232d4d; --good:#4ade80; --bad:#f87171; --warn:#fbbf24;
+    --ion-w:#38bdf8; --ion-w-ink:#082f49; --ppt:#6b7486; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f131b; --surface:#171c27; --surface-2:#202736; --ink:#e8ecf4; --ink-2:#b5bfd0; --ink-3:#8590a3;
+  --line:#2c3446; --accent:#7f9cff; --accent-soft:#232d4d; --good:#4ade80; --bad:#f87171; --warn:#fbbf24;
+  --ion-w:#38bdf8; --ion-w-ink:#082f49; --ppt:#6b7486; --shadow:none;
+}
+*{box-sizing:border-box}
+html{font-size:17px;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  line-height:1.7;word-break:keep-all;overflow-wrap:anywhere;
+  padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+a{color:var(--accent)}
+sub,sup{line-height:0}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px 80px}
+
+/* top bar */
+.topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  padding-top:env(safe-area-inset-top)}
+.topbar-in{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:8px;padding:8px 16px}
+.nav{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:none;text-decoration:none;color:var(--ink-2);font-weight:600;font-size:.86rem;padding:8px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);min-height:40px;display:flex;align-items:center}
+.nav a:active{background:var(--accent-soft)}
+.tools{display:flex;gap:6px;flex:none}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;
+  min-height:40px;min-width:40px;padding:6px 12px;font:inherit;font-size:.86rem;font-weight:600;cursor:pointer;touch-action:manipulation}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* hero */
+.hero{padding:36px 0 12px}
+.hero .kicker{display:inline-block;font-size:.8rem;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:999px}
+.hero h1{font-size:2rem;line-height:1.3;margin:12px 0 8px;letter-spacing:-.02em}
+.hero p{color:var(--ink-2);margin:0}
+.toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:20px 0 6px}
+.toc a{display:block;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.toc b{display:block;font-size:1rem}
+.toc span{font-size:.82rem;color:var(--ink-3)}
+.notice{font-size:.84rem;color:var(--ink-2);background:var(--surface-2);border-radius:12px;padding:12px 14px;margin-top:14px}
+
+/* sections */
+section{scroll-margin-top:70px}
+h2.sec{font-size:1.5rem;margin:48px 0 6px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+h2.sec .num{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:var(--accent);color:#fff;font-size:1rem}
+.sec-sub{color:var(--ink-3);margin:0 0 18px}
+h3{font-size:1.15rem;margin:28px 0 10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin:14px 0;box-shadow:var(--shadow)}
+.card h3:first-child{margin-top:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:720px){.grid2,.grid3{grid-template-columns:1fr}}
+.key{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;margin:12px 0}
+.key b{color:var(--accent)}
+.warnbox{background:color-mix(in srgb,var(--warn) 14%,var(--surface));border-left:4px solid var(--warn);border-radius:10px;padding:12px 14px;margin:12px 0}
+.eq{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:1rem;background:var(--surface-2);border-radius:10px;padding:10px 14px;margin:8px 0;overflow-x:auto;white-space:nowrap}
+.eq .net{color:var(--bad);font-weight:700}
+.muted{color:var(--ink-3)}
+.small{font-size:.86rem}
+.chip{display:inline-block;font-size:.76rem;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);margin-right:4px;white-space:nowrap}
+.chip.src{background:var(--accent-soft);color:var(--accent)}
+.chip.lv{background:color-mix(in srgb,var(--warn) 18%,var(--surface));color:var(--warn)}
+a.chip{text-decoration:none}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:420px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:center}
+th{background:var(--surface-2);font-weight:700}
+td.l,th.l{text-align:left}
+.o{color:var(--good);font-weight:800}.x{color:var(--bad);font-weight:800}
+
+/* figures */
+figure{margin:12px 0;text-align:center}
+figure svg{max-width:100%;height:auto;display:block;margin:0 auto}
+figcaption{font-size:.84rem;color:var(--ink-3);margin-top:6px}
+.beakers{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px;margin:10px 0}
+.beakers figure{margin:0;background:var(--surface-2);border-radius:12px;padding:8px 6px}
+.beakers figcaption b{color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;font-size:.82rem;color:var(--ink-2);margin:8px 0}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-right:4px}
+svg text{font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+.svg-ink{fill:var(--ink)}.svg-ink2{fill:var(--ink-2)}.svg-ink3{fill:var(--ink-3)}
+.svg-line{stroke:var(--line)}.svg-axis{stroke:var(--ink-2)}
+
+/* indicator + pH */
+.ind td .sw{display:inline-block;width:18px;height:18px;border-radius:5px;vertical-align:-4px;margin-right:6px;border:1px solid rgba(0,0,0,.12)}
+.phbar{height:30px;border-radius:10px;background:linear-gradient(90deg,#e11d48,#f97316,#facc15,#84cc16,#22c55e,#14b8a6,#3b82f6,#6366f1,#7c3aed);position:relative;margin:30px 0 40px}
+.phbar .t{position:absolute;top:34px;font-size:.72rem;color:var(--ink-2);transform:translateX(-50%);white-space:nowrap;text-align:center;line-height:1.3}
+.phbar .n{position:absolute;top:-22px;white-space:nowrap;font-size:.75rem;font-weight:700;color:var(--ink-2);transform:translateX(-50%)}
+
+/* life */
+.life{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.life div{background:var(--surface-2);border-radius:12px;padding:12px}
+.life b{display:block;margin-bottom:2px}
+.life .ab{font-size:.8rem;font-weight:700}
+.life .ab .a{color:var(--ion-h)}.life .ab .b{color:var(--ion-oh)}
+
+/* OX quiz */
+.ox{list-style:none;padding:0;margin:0}
+.ox li{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed var(--line)}
+.ox li:last-child{border-bottom:0}
+.ox .q{flex:1}
+.ox button{flex:none;min-width:64px}
+.ox .ans{display:none;font-size:.86rem;color:var(--ink-2);margin-top:4px}
+.ox li.show .ans{display:block}
+.ox li.show button{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+
+/* simulator */
+.sim{display:grid;grid-template-columns:260px 1fr;gap:16px;align-items:start}
+@media (max-width:760px){.sim{grid-template-columns:1fr}}
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.seg .btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+input[type=range]{width:100%;height:44px;accent-color:var(--accent)}
+.simstat{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin:8px 0}
+.simstat div{background:var(--surface-2);border-radius:10px;padding:8px 10px}
+.simstat small{display:block;color:var(--ink-3);font-size:.74rem}
+.simstat b{font-size:1.1rem}
+.tag-acid,.tag-neutral,.tag-base{display:inline-block;padding:2px 10px;border-radius:999px;font-weight:800;color:#1b2333}
+.tag-acid{background:var(--acid)}.tag-neutral{background:var(--neutral)}.tag-base{background:var(--base)}
+
+/* problems */
+.prob{position:relative}
+.prob-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:10px}
+.prob-head .pn{font-size:1.2rem;font-weight:800;margin-right:6px}
+.stem{margin:0 0 8px}
+.bogi{border:1.5px solid var(--ink-3);border-radius:10px;padding:10px 14px 6px;margin:14px 0 10px;position:relative}
+.bogi::before{content:"보 기";position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--surface);padding:0 10px;font-size:.84rem;font-weight:700;color:var(--ink-2)}
+.bogi p{margin:4px 0;padding-left:1.6em;text-indent:-1.6em}
+.choices{display:flex;flex-wrap:wrap;gap:6px 22px;margin:8px 0 4px}
+.choices button{appearance:none;background:none;border:1px solid transparent;border-radius:10px;font:inherit;color:var(--ink);padding:6px 8px;min-height:40px;cursor:pointer}
+.choices button.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--surface));font-weight:700}
+.choices button.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--surface));text-decoration:line-through}
+.feedback{font-size:.86rem;min-height:1.2em;font-weight:700}
+details.sol{margin-top:12px;border-radius:12px;background:var(--surface-2);overflow:hidden}
+details.sol>summary{list-style:none;cursor:pointer;padding:12px 16px;font-weight:700;display:flex;align-items:center;justify-content:space-between;min-height:48px;-webkit-user-select:none;user-select:none}
+details.sol>summary::-webkit-details-marker{display:none}
+details.sol>summary::after{content:"펼치기 ▾";font-size:.8rem;color:var(--ink-3)}
+details.sol[open]>summary::after{content:"접기 ▴"}
+.sol-body{padding:0 16px 16px}
+.sol-body ol{padding-left:1.3em}
+.sol-body li{margin:6px 0}
+.answer{display:inline-block;background:var(--accent);color:#fff;font-weight:800;border-radius:10px;padding:4px 14px;margin:8px 0}
+.verdict{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:8px 0}
+.verdict .o,.verdict .x{font-size:1.05rem}
+.skills-used{margin-top:10px;font-size:.84rem}
+.extra{margin-top:10px;padding:10px 12px;border:1px dashed var(--accent);border-radius:10px;font-size:.92rem}
+
+/* skills */
+.skill{display:grid;grid-template-columns:48px 1fr;gap:14px;scroll-margin-top:80px}
+.skill .sn{width:48px;height:48px;border-radius:14px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.05rem}
+.skill h3{margin:2px 0 6px}
+.skill .when{font-size:.82rem;color:var(--ink-3)}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:12px 0}
+.flow .st{flex:1 1 150px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;position:relative}
+.flow .st b{display:block;color:var(--accent);font-size:.8rem}
+.flow .st span{font-size:.92rem;font-weight:600}
+.cheat td{font-size:.88rem}
+
+@media print{
+  .topbar,.tools,.choices button,.feedback{display:none!important}
+  details.sol{display:block}
+  details.sol>summary::after{content:""}
+  .card{break-inside:avoid;box-shadow:none}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <nav class="nav" aria-label="목차">
+      <a href="#basic">① 기초 개념</a>
+      <a href="#core">② 실전 개념</a>
+      <a href="#sim">③ 시뮬레이터</a>
+      <a href="#probs">④ 기출 유형 문제</a>
+      <a href="#skills">⑤ 풀이 스킬</a>
+    </nav>
+    <div class="tools">
+      <button class="btn" id="fontDown" aria-label="글자 작게">가−</button>
+      <button class="btn" id="fontUp" aria-label="글자 크게">가+</button>
+      <button class="btn" id="themeBtn" aria-label="화면 테마 바꾸기">◐</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<div class="hero">
+  <span class="kicker">고1 통합과학 · 산과 염기</span>
+  <h1>중화반응 실전 문제풀이</h1>
+  <p>기초 개념 → 실전 개념(이온 수·그래프·온도) → 수능·평가원·학평 기출 유형 8문항 → 풀이 스킬 10가지 순서로 진행합니다. 문항마다 <b>풀이 보기</b>를 눌러 단계별 풀이를 펼칠 수 있습니다.</p>
+  <div class="toc">
+    <a href="#basic"><b>① 기초 개념</b><span>산·염기, 지시약, 중화 반응식, 생활 속 중화</span></a>
+    <a href="#core"><b>② 실전 개념</b><span>이온 모형, 이온 수 그래프, 전체 이온 수, 중화열</span></a>
+    <a href="#sim"><b>③ 시뮬레이터</b><span>슬라이더로 NaOH(aq)를 넣으며 이온 변화 관찰</span></a>
+    <a href="#probs"><b>④ 기출 유형 문제</b><span>8문항 · 난이도 ★★ ~ ★★★★</span></a>
+    <a href="#skills"><b>⑤ 풀이 스킬</b><span>10가지 스킬 + 5단계 풀이 루틴 + 요약표</span></a>
+  </div>
+  <div class="notice">📌 <b>문항 출처 안내</b> — ④의 문항은 2015~2025년 수능·평가원 모의평가(화학Ⅰ)와 고1 학력평가(통합과학)에 반복 출제된 <b>문항 유형을 고1 심화 수준으로 재구성</b>한 것입니다. 원문항의 그림·수치를 그대로 옮긴 것이 아니므로, 수업에서 "실제 기출"로 제시하려면 EBSi·한국교육과정평가원 기출 PDF의 원문항으로 바꿔 쓰세요. 모든 수치는 풀이와 맞도록 검산해 두었습니다.</div>
+</div>
+
+<!-- ================= ① 기초 개념 ================= -->
+<section id="basic">
+<h2 class="sec"><span class="num">1</span>기초 개념</h2>
+<p class="sec-sub">문제를 풀기 전에 꼭 필요한 최소한의 약속들</p>
+
+<div class="card">
+  <h3>1-1. 산과 염기는 "무엇을 내놓느냐"로 구별한다</h3>
+  <p>물에 녹아 <b style="color:var(--ion-h)">수소 이온(H<sup>+</sup>)</b>을 내놓는 물질이 <b>산</b>, <b style="color:var(--ion-oh)">수산화 이온(OH<sup>−</sup>)</b>을 내놓는 물질이 <b>염기</b>입니다. 산의 공통 성질은 H<sup>+</sup> 때문에, 염기의 공통 성질은 OH<sup>−</sup> 때문에 나타납니다.</p>
+  <figure data-fig="ionize"></figure>
+  <div class="grid2">
+    <div class="eq">HCl → H<sup>+</sup> + Cl<sup>−</sup><br>H<sub>2</sub>SO<sub>4</sub> → <b>2</b>H<sup>+</sup> + SO<sub>4</sub><sup>2−</sup><br>CH<sub>3</sub>COOH → H<sup>+</sup> + CH<sub>3</sub>COO<sup>−</sup></div>
+    <div class="eq">NaOH → Na<sup>+</sup> + OH<sup>−</sup><br>KOH → K<sup>+</sup> + OH<sup>−</sup><br>Ba(OH)<sub>2</sub> → Ba<sup>2+</sup> + <b>2</b>OH<sup>−</sup></div>
+  </div>
+  <div class="warnbox">⚠️ <b>가수(價數)에 주의!</b> H<sub>2</sub>SO<sub>4</sub> 1개는 H<sup>+</sup>를 <b>2개</b>, Ba(OH)<sub>2</sub> 1개는 OH<sup>−</sup>를 <b>2개</b> 내놓습니다. 심화 문제의 함정은 대부분 여기서 나옵니다.</div>
+  <div class="tbl-wrap"><table>
+    <tr><th></th><th>산성 (H<sup>+</sup>)</th><th>염기성 (OH<sup>−</sup>)</th></tr>
+    <tr><td>맛·촉감</td><td>신맛</td><td>쓴맛, 단백질을 녹여 미끈거림</td></tr>
+    <tr><td>금속과 반응</td><td>Mg, Zn 등과 반응해 H<sub>2</sub> 기체 발생</td><td>대부분 반응하지 않음</td></tr>
+    <tr><td>탄산 칼슘과 반응</td><td>CO<sub>2</sub> 기체 발생</td><td>반응하지 않음</td></tr>
+    <tr><td>전기 전도성</td><td colspan="2">수용액 속 이온 때문에 둘 다 전류가 흐른다</td></tr>
+  </table></div>
+</div>
+
+<div class="card">
+  <h3>1-2. 지시약과 pH</h3>
+  <div class="tbl-wrap"><table class="ind">
+    <tr><th class="l">지시약</th><th>산성</th><th>중성</th><th>염기성</th></tr>
+    <tr><td class="l">리트머스 종이</td><td><span class="sw" style="background:#3b82f6"></span>푸른색 → 붉은색</td><td>변화 없음</td><td><span class="sw" style="background:#ef4444"></span>붉은색 → 푸른색</td></tr>
+    <tr><td class="l"><b>BTB 용액</b></td><td><span class="sw" style="background:#facc15"></span>노란색</td><td><span class="sw" style="background:#4ade80"></span>초록색</td><td><span class="sw" style="background:#3b82f6"></span>파란색</td></tr>
+    <tr><td class="l"><b>페놀프탈레인 용액</b></td><td><span class="sw" style="background:#fff"></span>무색</td><td><span class="sw" style="background:#fff"></span>무색</td><td><span class="sw" style="background:#ec4899"></span>붉은색</td></tr>
+    <tr><td class="l">메틸 오렌지 용액</td><td><span class="sw" style="background:#ef4444"></span>붉은색</td><td><span class="sw" style="background:#facc15"></span>노란색</td><td><span class="sw" style="background:#facc15"></span>노란색</td></tr>
+  </table></div>
+  <div class="key"><b>함정 포인트</b> — 페놀프탈레인은 <u>중성에서도 무색</u>입니다. "무색이다 → 산성이다"는 틀린 추론! 무색이면 "산성 또는 중성"까지만 말할 수 있습니다.</div>
+  <div class="phbar" aria-label="pH 막대">
+    <span class="n" style="left:0%">0</span><span class="n" style="left:50%">7</span><span class="n" style="left:100%">14</span>
+    <span class="t" style="left:14%">위액<br>(pH 1~2)</span>
+    <span class="t" style="left:28%">식초·레몬</span>
+    <span class="t" style="left:50%">순수한 물<br>(중성)</span>
+    <span class="t" style="left:62%">혈액·바닷물</span>
+    <span class="t" style="left:72%">비눗물</span>
+    <span class="t" style="left:90%">하수구 세정제</span>
+  </div>
+  <p class="small muted">pH가 7보다 작으면 산성, 7이면 중성, 7보다 크면 염기성. 수용액 속 H<sup>+</sup>가 많을수록 pH가 작다.</p>
+</div>
+
+<div class="card">
+  <h3>1-3. 중화 반응 = H<sup>+</sup>와 OH<sup>−</sup>가 만나 물이 되는 반응</h3>
+  <figure data-fig="neut"><figcaption>Na<sup>+</sup>과 Cl<sup>−</sup>은 반응 전후 그대로 남는다 → <b>구경꾼 이온</b></figcaption></figure>
+  <div class="eq">전체 반응식 : HCl + NaOH → NaCl + H<sub>2</sub>O</div>
+  <div class="eq">알짜 이온 반응식 : <span class="net">H<sup>+</sup> + OH<sup>−</sup> → H<sub>2</sub>O</span> &nbsp;(<b>1 : 1</b>로 반응)</div>
+  <div class="grid2">
+    <div class="key"><b>구경꾼 이온</b> : 반응에 참여하지 않는 이온 (예: Na<sup>+</sup>, Cl<sup>−</sup>, K<sup>+</sup>, NO<sub>3</sub><sup>−</sup>). 넣은 양만큼 <u>그대로 쌓인다</u>.</div>
+    <div class="key"><b>염</b> : 산의 음이온 + 염기의 양이온이 만든 물질 (NaCl, KNO<sub>3</sub>, BaSO<sub>4</sub> …). BaSO<sub>4</sub>, CaCO<sub>3</sub>처럼 물에 녹지 않으면 <u>앙금</u>으로 가라앉는다.</div>
+  </div>
+  <div class="key"><b>중화점</b> : 산의 H<sup>+</sup> 수 = 염기의 OH<sup>−</sup> 수가 되어 <u>모두 반응한 지점</u>. 이때 생성된 물의 양이 최대 → 발생한 열(중화열)도 최대 → 온도가 가장 높다.</div>
+</div>
+
+<div class="card">
+  <h3>1-4. 생활 속 중화 반응</h3>
+  <div class="life">
+    <div><b>속 쓰릴 때 제산제</b><span class="ab"><span class="a">위산(HCl)</span> + <span class="b">수산화 마그네슘 등</span></span></div>
+    <div><b>산성 토양에 석회 뿌리기</b><span class="ab"><span class="a">산성 토양</span> + <span class="b">석회(염기성)</span></span></div>
+    <div><b>생선 요리에 레몬즙</b><span class="ab"><span class="b">비린내 성분(염기성)</span> + <span class="a">레몬즙(산)</span></span></div>
+    <div><b>벌레 물린 곳에 암모니아수</b><span class="ab"><span class="a">개미산(폼산)</span> + <span class="b">암모니아수</span></span></div>
+    <div><b>산성화된 호수에 석회 가루</b><span class="ab"><span class="a">산성비</span> + <span class="b">석회</span></span></div>
+    <div><b>비누 사용 후 산성 린스</b><span class="ab"><span class="b">비누(염기성)</span> + <span class="a">린스(약산성)</span></span></div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>✅ 개념 체크 OX <span class="muted small">(눌러서 정답 확인)</span></h3>
+  <ul class="ox" id="oxList">
+    <li><div class="q">1. HCl(aq)에 NaOH(aq)을 넣으면 Cl<sup>−</sup>의 수는 줄어든다.<div class="ans"><b class="x">X</b> — Cl<sup>−</sup>은 구경꾼 이온이라 수가 일정하다. 줄어드는 것은 H<sup>+</sup>.</div></div><button class="btn">정답</button></li>
+    <li><div class="q">2. 페놀프탈레인 용액이 무색이면 그 용액은 산성이다.<div class="ans"><b class="x">X</b> — 중성에서도 무색. "산성 또는 중성".</div></div><button class="btn">정답</button></li>
+    <li><div class="q">3. H<sub>2</sub>SO<sub>4</sub> 1개를 완전히 중화하려면 NaOH 2개가 필요하다.<div class="ans"><b class="o">O</b> — H<sub>2</sub>SO<sub>4</sub>는 H<sup>+</sup>를 2개 내놓는다.</div></div><button class="btn">정답</button></li>
+    <li><div class="q">4. 중화점에서 혼합 용액 속 이온은 하나도 없다. (HCl + NaOH)<div class="ans"><b class="x">X</b> — Na<sup>+</sup>, Cl<sup>−</sup>이 남아 있다. 이온 수가 0이 되는 건 앙금이 생기는 H<sub>2</sub>SO<sub>4</sub> + Ba(OH)<sub>2</sub> 같은 경우.</div></div><button class="btn">정답</button></li>
+    <li><div class="q">5. 중화 반응은 열을 방출하는 반응이다.<div class="ans"><b class="o">O</b> — 중화열. 생성된 물의 양이 많을수록 열이 많이 난다.</div></div><button class="btn">정답</button></li>
+  </ul>
+</div>
+</section>
+
+<!-- ================= ② 실전 개념 ================= -->
+<section id="core">
+<h2 class="sec"><span class="num">2</span>실전 개념</h2>
+<p class="sec-sub">기출은 결국 "이온을 세는 문제"입니다. 아래 다섯 장면을 머리에 그릴 수 있으면 끝.</p>
+
+<div class="card">
+  <h3>2-1. 이온 모형으로 보는 단계별 변화</h3>
+  <p>HCl(aq) 10 mL (H<sup>+</sup> 4개, Cl<sup>−</sup> 4개)에 NaOH(aq)을 5 mL(Na<sup>+</sup> 2개, OH<sup>−</sup> 2개)씩 넣어 봅시다.</p>
+  <div class="legend" data-legend="H,Cl,Na,OH,W"></div>
+  <div class="beakers" data-fig="steps"></div>
+  <div class="tbl-wrap"><table>
+    <tr><th>NaOH(aq) (mL)</th><th>0</th><th>5</th><th>10</th><th>15</th><th>20</th></tr>
+    <tr><td style="color:var(--ion-h);font-weight:700">H<sup>+</sup></td><td>4</td><td>2</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td style="color:var(--ion-cl);font-weight:700">Cl<sup>−</sup></td><td>4</td><td>4</td><td>4</td><td>4</td><td>4</td></tr>
+    <tr><td style="color:var(--ion-na);font-weight:700">Na<sup>+</sup></td><td>0</td><td>2</td><td>4</td><td>6</td><td>8</td></tr>
+    <tr><td style="color:var(--ion-oh);font-weight:700">OH<sup>−</sup></td><td>0</td><td>0</td><td>0</td><td>2</td><td>4</td></tr>
+    <tr><th>전체 이온 수</th><th>8</th><th>8</th><th>8</th><th>12</th><th>16</th></tr>
+    <tr><td>생성된 H<sub>2</sub>O</td><td>0</td><td>2</td><td>4</td><td>4</td><td>4</td></tr>
+    <tr><td>액성 (BTB)</td><td><span class="tag-acid">산성</span></td><td><span class="tag-acid">산성</span></td><td><span class="tag-neutral">중성</span></td><td><span class="tag-base">염기성</span></td><td><span class="tag-base">염기성</span></td></tr>
+  </table></div>
+  <div class="key"><b>관찰 포인트</b> ① 중화점 전에는 H<sup>+</sup> 1개가 사라질 때 Na<sup>+</sup> 1개가 들어와 <u>전체 이온 수 일정</u>. ② 중화점 후에는 Na<sup>+</sup>, OH<sup>−</sup>가 함께 쌓여 <u>2개씩 증가</u>. ③ 생성된 물은 중화점 이후 더 늘지 않는다.</div>
+</div>
+
+<div class="card">
+  <h3>2-2. 이온 수 그래프 — 네 개의 선을 읽는 법</h3>
+  <div class="grid2">
+    <figure data-fig="graph4"><figcaption>이온별 수 (HCl(aq) 10 mL + NaOH(aq))</figcaption></figure>
+    <figure data-fig="graphTotal"><figcaption>전체 이온 수</figcaption></figure>
+  </div>
+  <div class="tbl-wrap"><table>
+    <tr><th>선의 모양</th><th>정체</th><th>이유</th></tr>
+    <tr><td>처음에 있다가 감소 → 0</td><td style="color:var(--ion-h);font-weight:700">H<sup>+</sup> (원래 용액의 반응 이온)</td><td>넣은 OH<sup>−</sup>와 1:1 반응</td></tr>
+    <tr><td>처음부터 끝까지 일정</td><td style="color:var(--ion-cl);font-weight:700">Cl<sup>−</sup> (원래 용액의 구경꾼)</td><td>반응하지 않고 새로 들어오지도 않음</td></tr>
+    <tr><td>0에서 출발해 계속 증가</td><td style="color:var(--ion-na);font-weight:700">Na<sup>+</sup> (넣는 용액의 구경꾼)</td><td>넣는 만큼 쌓임</td></tr>
+    <tr><td>0으로 있다가 중화점 이후 증가</td><td style="color:var(--ion-oh);font-weight:700">OH<sup>−</sup> (넣는 용액의 반응 이온)</td><td>H<sup>+</sup>가 다 없어진 뒤부터 남음</td></tr>
+  </table></div>
+  <div class="key"><b>꿀팁</b> — 감소하는 선과 늦게 증가하는 선이 0이 되는/0을 벗어나는 지점이 <b>중화점</b>. NaOH(aq)에 HCl(aq)을 넣는 경우엔 역할만 바뀝니다 (OH<sup>−</sup> 감소, Na<sup>+</sup> 일정, Cl<sup>−</sup> 증가, H<sup>+</sup> 늦게 증가).</div>
+</div>
+
+<div class="card">
+  <h3>2-3. 전체 이온 수 그래프 3종 비교 (심화 단골)</h3>
+  <div class="grid3" data-fig="total3"></div>
+  <div class="tbl-wrap"><table>
+    <tr><th>조합</th><th>중화점 전</th><th>중화점</th><th>중화점 후</th></tr>
+    <tr><td class="l">HCl + NaOH</td><td>일정 (H<sup>+</sup> 1개 ↓, Na<sup>+</sup> 1개 ↑)</td><td>Na<sup>+</sup>, Cl<sup>−</sup>만 존재</td><td>증가</td></tr>
+    <tr><td class="l">H<sub>2</sub>SO<sub>4</sub> + NaOH</td><td>일정 (H<sup>+</sup> 1개 ↓, Na<sup>+</sup> 1개 ↑)</td><td>Na<sup>+</sup>, SO<sub>4</sub><sup>2−</sup>만 존재</td><td>증가</td></tr>
+    <tr><td class="l">H<sub>2</sub>SO<sub>4</sub> + Ba(OH)<sub>2</sub></td><td><b>감소</b> (Ba<sup>2+</sup>도 SO<sub>4</sub><sup>2−</sup>와 앙금)</td><td><b>이온 수 0</b> → 전류 흐르지 않음</td><td>증가</td></tr>
+  </table></div>
+</div>
+
+<div class="card">
+  <h3>2-4. 중화열과 온도 그래프</h3>
+  <div class="grid2">
+    <figure data-fig="tempFixed"><figcaption>(가) 총 부피를 50 mL로 고정하고 비율만 바꾼 실험</figcaption></figure>
+    <figure data-fig="tempAdd"><figcaption>(나) HCl(aq) 20 mL에 NaOH(aq)을 계속 넣는 실험</figcaption></figure>
+  </div>
+  <div class="grid2">
+    <div class="key"><b>(가) 총 부피 고정</b> — 온도 변화 ∝ 생성된 물의 양. 왼쪽 직선과 오른쪽 직선의 <u>교점(꼭짓점)이 중화점</u>. 꼭짓점의 부피 비로 농도 비를 구한다.</div>
+    <div class="key"><b>(나) 계속 넣기</b> — 중화점에서 최고 온도. 이후엔 더 이상 열이 나지 않고, 차가운 용액이 섞여 들어와 <u>온도가 서서히 내려간다</u>.</div>
+  </div>
+  <p class="small muted">조건: 혼합 전 두 용액의 온도가 같고, 용액의 밀도·비열이 같으며, 열 손실은 무시한다(문제의 "단서"로 항상 주어짐).</p>
+</div>
+
+<div class="card">
+  <h3>2-5. 액성별로 남는 이온 (HCl + NaOH)</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th>혼합 용액</th><th>존재하는 이온</th><th>이온 종류 수</th><th>가장 많은 이온</th></tr>
+    <tr><td><span class="tag-acid">산성</span></td><td>H<sup>+</sup>, Cl<sup>−</sup>, Na<sup>+</sup></td><td>3</td><td>Cl<sup>−</sup> (= H<sup>+</sup> + Na<sup>+</sup>)</td></tr>
+    <tr><td><span class="tag-neutral">중성</span></td><td>Cl<sup>−</sup>, Na<sup>+</sup> (같은 수)</td><td>2</td><td>—</td></tr>
+    <tr><td><span class="tag-base">염기성</span></td><td>Na<sup>+</sup>, Cl<sup>−</sup>, OH<sup>−</sup></td><td>3</td><td>Na<sup>+</sup> (= Cl<sup>−</sup> + OH<sup>−</sup>)</td></tr>
+  </table></div>
+  <div class="key"><b>전하 균형</b> — 용액 전체는 전기적으로 중성이므로 (양이온의 전하 합) = (음이온의 전하 합). 산성일 때 H<sup>+</sup> + Na<sup>+</sup> = Cl<sup>−</sup>, 그래서 Cl<sup>−</sup>이 가장 많다.</div>
+</div>
+</section>
+
+<!-- ================= ③ 시뮬레이터 ================= -->
+<section id="sim">
+<h2 class="sec"><span class="num">3</span>중화 반응 시뮬레이터</h2>
+<p class="sec-sub">수업 중 아이패드로 슬라이더를 움직이며 보여 주세요. 산 10 mL에 염기를 2.5 mL씩 넣습니다.</p>
+<div class="card">
+  <div class="seg" id="simMode" role="group" aria-label="반응 조합">
+    <button class="btn" data-mode="hcl" aria-pressed="true">HCl + NaOH</button>
+    <button class="btn" data-mode="h2so4" aria-pressed="false">H₂SO₄ + NaOH</button>
+    <button class="btn" data-mode="ba" aria-pressed="false">H₂SO₄ + Ba(OH)₂</button>
+  </div>
+  <div class="sim">
+    <div>
+      <figure id="simBeaker" style="margin:0"></figure>
+      <label for="simRange" class="small"><b>넣은 염기 : <span id="simVol">0</span> mL</b></label>
+      <input type="range" id="simRange" min="0" max="8" step="1" value="0">
+      <div class="legend" id="simLegend"></div>
+    </div>
+    <div>
+      <div class="simstat" id="simStat"></div>
+      <figure id="simChart" style="margin:6px 0 0"></figure>
+      <p class="small muted" id="simNote"></p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ================= ④ 문제 ================= -->
+<section id="probs">
+<h2 class="sec"><span class="num">4</span>기출 유형 실전 문제</h2>
+<p class="sec-sub">선택지를 눌러 바로 채점할 수 있고, 아래 <b>풀이 보기</b>로 단계별 풀이를 펼칩니다.</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+  <button class="btn" id="openAll">풀이 모두 펼치기</button>
+  <button class="btn" id="closeAll">풀이 모두 접기</button>
+  <button class="btn" id="resetChoices">채점 초기화</button>
+</div>
+
+<!-- P1 -->
+<article class="card prob" data-answer="3">
+  <div class="prob-head"><span class="pn">01</span><span class="chip src">학평 고1 통합과학 유형</span><span class="chip lv">★★</span><span class="chip">이온 모형</span></div>
+  <p class="stem">그림은 HCl(aq) 10 mL에 NaOH(aq)을 각각 5 mL, 10 mL, 15 mL 넣은 혼합 용액 (가)~(다) 중 <b>(가)</b>에 존재하는 이온을 모형으로 나타낸 것이다.</p>
+  <figure data-fig="p1"><figcaption>(가) : HCl(aq) 10 mL + NaOH(aq) 5 mL &nbsp;(물 분자는 나타내지 않음)</figcaption></figure>
+  <p class="small muted">(단, 혼합 전 두 용액의 온도는 같고, 물의 자동 이온화는 무시한다.)</p>
+  <div class="bogi">
+    <p>ㄱ. (가)에 BTB 용액을 떨어뜨리면 노란색을 띤다.</p>
+    <p>ㄴ. (가)에서 가장 많이 존재하는 이온은 Na<sup>+</sup>이다.</p>
+    <p>ㄷ. 혼합 용액 속 전체 이온 수는 (다)가 (나)의 1.5배이다.</p>
+  </div>
+  <div class="choices" data-opts="ㄱ|ㄴ|ㄱ, ㄷ|ㄴ, ㄷ|ㄱ, ㄴ, ㄷ"></div><div class="feedback"></div>
+  <details class="sol"><summary>풀이 보기</summary><div class="sol-body">
+    <ol>
+      <li><b>구경꾼 이온으로 넣은 양 읽기</b> — Cl<sup>−</sup> 4개 → HCl(aq) 10 mL에는 H<sup>+</sup> 4개, Cl<sup>−</sup> 4개. Na<sup>+</sup> 2개 → NaOH(aq) 5 mL에는 Na<sup>+</sup> 2개, OH<sup>−</sup> 2개.</li>
+      <li><b>(나), (다) 만들기</b> — NaOH(aq) 10 mL = OH<sup>−</sup> 4개 → (나)는 중화점. 15 mL = OH<sup>−</sup> 6개 → (다)에는 OH<sup>−</sup> 2개가 남는다.</li>
+    </ol>
+    <div class="beakers" data-fig="p1sol"></div>
+    <div class="tbl-wrap"><table>
+      <tr><th></th><th>H<sup>+</sup></th><th>Cl<sup>−</sup></th><th>Na<sup>+</sup></th><th>OH<sup>−</sup></th><th>전체</th><th>액성</th></tr>
+      <tr><td>(가) 5 mL</td><td>2</td><td>4</td><td>2</td><td>0</td><td>8</td><td>산성</td></tr>
+      <tr><td>(나) 10 mL</td><td>0</td><td>4</td><td>4</td><td>0</td><td>8</td><td>중성</td></tr>
+      <tr><td>(다) 15 mL</td><td>0</td><td>4</td><td>6</td><td>2</td><td>12</td><td>염기성</td></tr>
+    </table></div>
+    <div class="verdict">
+      <span class="o">ㄱ O</span><span>(가)에 H<sup>+</sup>이 남아 있으므로 산성 → BTB 노란색.</span>
+      <span class="x">ㄴ X</span><span>가장 많은 이온은 Cl<sup>−</sup>(4개). 산성 용액에서는 항상 산의 음이온이 최다.</span>
+      <span class="o">ㄷ O</span><span>(다) 12 : (나) 8 = 1.5배.</span>
+    </div>
+    <span class="answer">정답 ③ ㄱ, ㄷ</span>
+    <div class="skills-used">사용 스킬 : <a class="chip" href="#s1">S1 구경꾼 이온</a><a class="chip" href="#s3">S3 min 규칙</a><a class="chip" href="#s6">S6 이온 모형 판별</a></div>
+  </div></details>
+</article>
+
+<!-- P2 -->
+<article class="card prob" data-answer="5">
+  <div class="prob-head"><span class="pn">02</span><span class="chip src">학평 고1 통합과학 유형</span><span class="chip lv">★★</span><span class="chip">이온 수 그래프</span></div>
+  <p class="stem">그림은 HCl(aq) 20 mL에 NaOH(aq)을 조금씩 넣을 때, 혼합 용액 속 이온 A~D의 수를 넣어 준 NaOH(aq)의 부피에 따라 나타낸 것이다.</p>
+  <figure data-fig="p2"></figure>
+  <div class="bogi">
+    <p>ㄱ. A는 H<sup>+</sup>이다.</p>
+    <p>ㄴ. NaOH(aq) 5 mL를 넣었을 때 혼합 용액 속 전체 이온 수는 HCl(aq) 20 mL 속 전체 이온 수와 같다.</p>
+    <p>ㄷ. 혼합 용액의 단위 부피당 전체 이온 수는 NaOH(aq) 5 mL를 넣었을 때가 10 mL를 넣었을 때보다 크다.</p>
+  </div>
+  <div class="choices" data-opts="ㄱ|ㄷ|ㄱ, ㄴ|ㄴ, ㄷ|ㄱ, ㄴ, ㄷ"></div><div class="feedback"></div>
+  <details class="sol"><summary>풀이 보기</summary><div class="sol-body">
+    <ol>
+      <li><b>4선 판별</b> — A: 감소 → <b>H<sup>+</sup></b> / B: 일정 → <b>Cl<sup>−</sup></b> / C: 0에서 계속 증가 → <b>Na<sup>+</sup></b> / D: 10 mL 이후 증가 → <b>OH<sup>−</sup></b>. 중화점은 10 mL.</li>
+      <li><b>양 읽기</b> — HCl(aq) 20 mL : H<sup>+</sup> N, Cl<sup>−</sup> N. NaOH(aq) 10 mL : Na<sup>+</sup> N, OH<sup>−</sup> N.</li>
+      <li><b>5 mL 넣었을 때</b> — H<sup>+</sup> 0.5N, Cl<sup>−</sup> N, Na<sup>+</sup> 0.5N → 전체 2N (처음 2N과 같음). 부피 25 mL.</li>
+      <li><b>10 mL 넣었을 때</b> — Cl<sup>−</sup> N, Na<sup>+</sup> N → 전체 2N. 부피 30 mL.</li>
+    </ol>
+    <div class="verdict">
+      <span class="o">ㄱ O</span><span>감소하는 선 = 원래 용액의 반응 이온 = H<sup>+</sup>.</span>
+      <span class="o">ㄴ O</span><span>중화점 전에는 H<sup>+</sup> 1개 ↓, Na<sup>+</sup> 1개 ↑ → 전체 이온 수 2N 유지.</span>
+      <span class="o">ㄷ O</span><span>전체 이온 수는 2N으로 같지만 부피가 25 mL &lt; 30 mL → 단위 부피당 이온 수는 5 mL일 때가 크다.</span>
+    </div>
+    <span class="answer">정답 ⑤ ㄱ, ㄴ, ㄷ</span>
+    <div class="skills-used">사용 스킬 : <a class="chip" href="#s5">S5 그래프 4선 판별</a><a class="chip" href="#s4">S4 전체 이온 수 패턴</a><a class="chip" href="#s10">S10 전체 vs 단위 부피당</a></div>
+  </div></details>
+</article>
+
+<!-- P3 -->
+<article class="card prob" data-answer="3">
+  <div class="prob-head"><span class="pn">03</span><span class="chip src">평가원 화학Ⅰ 유형 → 고1 변형</span><span class="chip lv">★★★</span><span class="chip">전체 이온 수 그래프</span></div>
+  <p class="stem">그림은 HCl(aq) 10 mL에 NaOH(aq)을 조금씩 넣을 때, 넣어 준 NaOH(aq)의 부피에 따른 혼합 용액 속 <b>전체 이온 수</b>를 나타낸 것이다.</p>
+  <figure data-fig="p3"></figure>
+  <div class="bogi">
+    <p>ㄱ. NaOH(aq) 10 mL를 넣은 혼합 용액에서 H<sup>+</sup> 수와 Na<sup>+</sup> 수는 같다.</p>
+    <p>ㄴ. NaOH(aq) 30 mL를 넣은 혼합 용액에서 OH<sup>−</sup> 수 : Cl<sup>−</sup> 수 = 1 : 2이다.</p>
+    <p>ㄷ. NaOH(aq) 0~20 mL 구간에서 혼합 용액의 단위 부피당 전체 이온 수는 일정하다.</p>
+  </div>
+  <div class="choices" data-opts="ㄱ|ㄷ|ㄱ, ㄴ|ㄴ, ㄷ|ㄱ, ㄴ, ㄷ"></div><div class="feedback"></div>
+  <details class="sol"><summary>풀이 보기</summary><div class="sol-body">
+    <ol>
+      <li><b>꺾이는 점 = 중화점</b> — 20 mL까지 전체 이온 수가 일정하다가 증가 → 중화점은 NaOH(aq) 20 mL.</li>
+      <li><b>처음 용액</b> — 전체 4N = H<sup>+</sup> 2N + Cl<sup>−</sup> 2N.</li>
+      <li><b>넣는 용액</b> — 중화점에서 OH<sup>−</sup> 2N이 들어갔으므로 NaOH(aq) 20 mL : Na<sup>+</sup> 2N, OH<sup>−</sup> 2N → 10 mL당 N개씩.<br><span class="muted small">검산: 20→30 mL 동안 Na<sup>+</sup> N + OH<sup>−</sup> N = 2N 증가 → 4N → 6N ✔</span></li>
+    </ol>
+    <div class="tbl-wrap"><table>
+      <tr><th>NaOH(aq)</th><th>H<sup>+</sup></th><th>Cl<sup>−</sup></th><th>Na<sup>+</sup></th><th>OH<sup>−</sup></th><th>전체</th><th>부피</th></tr>
+      <tr><td>10 mL</td><td>N</td><td>2N</td><td>N</td><td>0</td><td>4N</td><td>20 mL</td></tr>
+      <tr><td>20 mL</td><td>0</td><td>2N</td><td>2N</td><td>0</td><td>4N</td><td>30 mL</td></tr>
+      <tr><td>30 mL</td><td>0</td><td>2N</td><td>3N</td><td>N</td><td>6N</td><td>40 mL</td></tr>
+    </table></div>
+    <div class="verdict">
+      <span class="o">ㄱ O</span><span>H<sup>+</sup> N = Na<sup>+</sup> N.</span>
+      <span class="o">ㄴ O</span><span>OH<sup>−</sup> N : Cl<sup>−</sup> 2N = 1 : 2.</span>
+      <span class="x">ㄷ X</span><span>전체 이온 수는 4N으로 일정하지만 부피가 10 → 30 mL로 늘어나므로 단위 부피당 이온 수는 <b>감소</b>. "전체"와 "단위 부피당"을 구별하라!</span>
+    </div>
+    <span class="answer">정답 ③ ㄱ, ㄴ</span>
+    <div class="skills-used">사용 스킬 : <a class="chip" href="#s4">S4 전체 이온 수 패턴</a><a class="chip" href="#s10">S10 전체 vs 단위 부피당</a></div>
+  </div></details>
+</article>
+
+<!-- P4 -->
+<article class="card prob" data-answer="4">
+  <div class="prob-head"><span class="pn">04</span><span class="chip src">수능 화학Ⅰ 유형 → 고1 변형</span><span class="chip lv">★★★</span><span class="chip">표 해석 · 미지수</span></div>
+  <p class="stem">표는 HCl(aq)과 NaOH(aq)의 부피를 달리하여 혼합한 용액 (가)와 (나)에 대한 자료이다.</p>
+  <div class="tbl-wrap"><table style="max-width:560px;margin:0 auto">
+    <tr><th>혼합 용액</th><th>HCl(aq) 부피(mL)</th><th>NaOH(aq) 부피(mL)</th><th>액성</th><th>전체 이온 수(상댓값)</th></tr>
+    <tr><td>(가)</td><td>10</td><td>10</td><td>산성</td><td>4</td></tr>
+    <tr><td>(나)</td><td>10</td><td>30</td><td>염기성</td><td>6</td></tr>
+  </table></div>
+  <div class="bogi">
+    <p>ㄱ. 단위 부피당 H<sup>+</sup> 수는 HCl(aq)이 NaOH(aq)의 단위 부피당 OH<sup>−</sup> 수의 2배이다.</p>
+    <p>ㄴ. 생성된 물 분자 수는 (나)가 (가)의 2배이다.</p>
+    <p>ㄷ. (나)에서 Na<sup>+</sup> 수 : Cl<sup>−</sup> 수 = 2 : 1이다.</p>
+  </div>
+  <div class="choices" data-opts="ㄱ|ㄴ|ㄷ|ㄱ, ㄴ|ㄴ, ㄷ"></div><div class="feedback"></div>
+  <details class="sol"><summary>풀이 보기</summary><div class="sol-body">
+    <ol>
+      <li><b>미지수 놓기</b> — HCl(aq) 1 mL당 H<sup>+</sup>(=Cl<sup>−</sup>) <i>a</i>개, NaOH(aq) 1 mL당 OH<sup>−</sup>(=Na<sup>+</sup>) <i>b</i>개.</li>
+      <li><b>1가+1가 공식</b> — 혼합 용액 전체 이온 수 = 2 × (더 많이 넣은 쪽의 구경꾼 이온 수).<br>
+        산성이면 전체 = 2 × Cl<sup>−</sup>, 염기성이면 전체 = 2 × Na<sup>+</sup>.</li>
+      <li>(가) 산성 : 2 × 10<i>a</i> = 4 → 10<i>a</i> = 2 &nbsp;&nbsp; (나) 염기성 : 2 × 30<i>b</i> = 6 → 30<i>b</i> = 3, 10<i>b</i> = 1</li>
+      <li>∴ <i>a</i> : <i>b</i> = 0.2 : 0.1 = <b>2 : 1</b> <span class="muted small">(검산: (가) H<sup>+</sup> 2 &gt; OH<sup>−</sup> 1 산성 ✔, (나) OH<sup>−</sup> 3 &gt; H<sup>+</sup> 2 염기성 ✔)</span></li>
+    </ol>
+    <div class="tbl-wrap"><table>
+      <tr><th></th><th>넣은 H<sup>+</sup></th><th>넣은 OH<sup>−</sup></th><th>생성된 H<sub>2</sub>O</th><th>남은 이온</th></tr>
+      <tr><td>(가)</td><td>2</td><td>1</td><td>1</td><td>H<sup>+</sup> 1, Cl<sup>−</sup> 2, Na<sup>+</sup> 1</td></tr>
+      <tr><td>(나)</td><td>2</td><td>3</td><td>2</td><td>OH<sup>−</sup> 1, Cl<sup>−</sup> 2, Na<sup>+</sup> 3</td></tr>
+    </table></div>
+    <div class="verdict">
+      <span class="o">ㄱ O</span><span><i>a</i> = 2<i>b</i>.</span>
+      <span class="o">ㄴ O</span><span>물 = min(H<sup>+</sup>, OH<sup>−</sup>) → (가) 1, (나) 2.</span>
+      <span class="x">ㄷ X</span><span>Na<sup>+</sup> 3 : Cl<sup>−</sup> 2 = 3 : 2.</span>
+    </div>
+    <span class="answer">정답 ④ ㄱ, ㄴ</span>
+    <div class="extra">💬 <b>추가 발문</b> — HCl(aq) 15 mL를 완전히 중화하려면 NaOH(aq) 몇 mL가 필요할까? → H<sup>+</sup> 15<i>a</i> = 3 = 30<i>b</i> → <b>30 mL</b></div>
+    <div class="skills-used">사용 스킬 : <a class="chip" href="#s2">S2 미지수 a, b</a><a class="chip" href="#s4">S4 전체 이온 수 패턴</a><a class="chip" href="#s3">S3 min 규칙</a></div>
+  </div></details>
+</article>
+
+<!-- P5 -->
+<article class="card prob" data-answer="4">
+  <div class="prob-head"><span class="pn">05</span><span class="chip src">평가원·학평 공통 유형</span><span class="chip lv">★★★</span><span class="chip">중화열 · 온도</span></div>
+  <p class="stem">그림은 온도가 같은 HCl(aq)과 NaOH(aq)을 부피를 달리하여 혼합하되 <b>전체 부피를 50 mL로 일정하게</b> 하였을 때, 혼합 용액의 온도 변화(ΔT)를 나타낸 것이다.</p>
+  <figure data-fig="p5"></figure>
+  <p class="small muted">(단, 혼합 용액의 밀도와 비열은 같고, 열 손실은 무시한다.)</p>
+  <div class="bogi">
+    <p>ㄱ. 온도 변화가 가장 큰 혼합 용액에 페놀프탈레인 용액을 떨어뜨리면 붉은색을 띤다.</p>
+    <p>ㄴ. 단위 부피당 H<sup>+</sup> 수는 HCl(aq)이 NaOH(aq)의 단위 부피당 OH<sup>−</sup> 수의 1.5배이다.</p>
+    <p>ㄷ. HCl(aq) 10 mL와 NaOH(aq) 40 mL를 혼합한 용액은 염기성이다.</p>
+  </div>
+  <div class="choices" data-opts="ㄱ|ㄷ|ㄱ, ㄴ|ㄴ, ㄷ|ㄱ, ㄴ, ㄷ"></div><div class="feedback"></div>
+  <details class="sol"><summary>풀이 보기</summary><div class="sol-body">
+    <ol>
+      <li><b>총 부피가 같다 → ΔT ∝ 생성된 물 분자 수</b>.</li>
+      <li><b>두 직선으로 나누기</b> — 왼쪽 구간은 HCl(aq)이 적어서 <b>HCl이 모두 반응</b> → ΔT ∝ HCl 부피 : (0, 0), (10, 3), (20, 6)이 한 직선 (1 mL당 0.3). 오른쪽 구간은 NaOH(aq)이 적어서 <b>NaOH가 모두 반응</b> → ΔT ∝ NaOH 부피 : (30, 4), (40, 2), (50, 0)이 한 직선 (NaOH 1 mL당 0.2).</li>
+      <li>0.3<i>x</i> = 0.2(50 − <i>x</i>) → <i>x</i> = 20. 꼭짓점 = HCl(aq) 20 mL + NaOH(aq) 30 mL = <b>중화점</b>.</li>
+      <li>20<i>a</i> = 30<i>b</i> → <i>a</i> : <i>b</i> = 3 : 2 → <i>a</i> = 1.5<i>b</i>. <span class="muted small">(또는 기울기 비 0.3 : 0.2 = 3 : 2로 바로)</span></li>
+    </ol>
+    <figure data-fig="p5sol"><figcaption>두 직선의 기울기 비 = 두 용액의 단위 부피당 반응 이온 수의 비</figcaption></figure>
+    <div class="verdict">
+      <span class="x">ㄱ X</span><span>꼭짓점은 중성 → 페놀프탈레인은 <b>무색</b>.</span>
+      <span class="o">ㄴ O</span><span><i>a</i> : <i>b</i> = 3 : 2.</span>
+      <span class="o">ㄷ O</span><span>H<sup>+</sup> 10<i>a</i> = 15<i>b</i> &lt; OH<sup>−</sup> 40<i>b</i> → 염기성. (꼭짓점보다 오른쪽 = NaOH 과량)</span>
+    </div>
+    <span class="answer">정답 ④ ㄴ, ㄷ</span>
+    <div class="extra">💬 <b>추가 발문</b> — HCl(aq) 15 mL를 중화하는 NaOH(aq)의 부피는? → 15 × 1.5 = <b>22.5 mL</b></div>
+    <div class="skills-used">사용 스킬 : <a class="chip" href="#s9">S9 온도 그래프</a><a class="chip" href="#s2">S2 미지수 a, b</a></div>
+  </div></details>
+</article>
+
+<!-- P6 -->
+<article class="card prob" data-answer="3">
+  <div class="prob-head"><span class="pn">06</span><span class="chip src">화학Ⅰ 앙금 유형 → 고1 심화</span><span class="chip lv">★★★</span><span class="chip">2가 산·염기 · 앙금</span></div>
+  <p class="stem">그림은 H<sub>2</sub>SO<sub>4</sub>(aq) 10 mL에 Ba(OH)<sub>2</sub>(aq)을 조금씩 넣을 때, 넣어 준 Ba(OH)<sub>2</sub>(aq)의 부피에 따른 혼합 용액 속 전체 이온 수를 나타낸 것이다.</p>
+  <figure data-fig="p6"></figure>
+  <p class="small muted">(단, 생성된 BaSO<sub>4</sub>은 앙금으로 가라앉으며 이온으로 존재하지 않는다.)</p>
+  <div class="bogi">
+    <p>ㄱ. Ba(OH)<sub>2</sub>(aq) 20 mL를 넣었을 때까지 생성된 물 분자 수는 2N이다.</p>
+    <p>ㄴ. Ba(OH)<sub>2</sub>(aq) 10 mL를 넣은 혼합 용액에서 H<sup>+</sup> 수와 SO<sub>4</sub><sup>2−</sup> 수는 같다.</p>
+    <p>ㄷ. 단위 부피당 전체 이온 수는 H<sub>2</sub>SO<sub>4</sub>(aq)이 Ba(OH)<sub>2</sub>(aq)의 2배이다.</p>
+  </div>
+  <div class="choices" data-opts="ㄱ|ㄴ|ㄱ, ㄷ|ㄴ, ㄷ|ㄱ, ㄴ, ㄷ"></div><div class="feedback"></div>
+  <details class="sol"><summary>풀이 보기</summary><div class="sol-body">
+    <ol>
+      <li><b>가수로 쪼개기</b> — H<sub>2</sub>SO<sub>4</sub> → 2H<sup>+</sup> + SO<sub>4</sub><sup>2−</sup>. 처음 3N = H<sup>+</sup> <b>2N</b> + SO<sub>4</sub><sup>2−</sup> <b>N</b>.</li>
+      <li><b>0이 되는 점</b> — 20 mL에서 이온이 하나도 없음 → H<sup>+</sup> 2N은 OH<sup>−</sup> 2N과 물이 되고, SO<sub>4</sub><sup>2−</sup> N은 Ba<sup>2+</sup> N과 앙금이 됨. ∴ Ba(OH)<sub>2</sub>(aq) 20 mL : Ba<sup>2+</sup> N, OH<sup>−</sup> 2N (전체 3N).</li>
+      <li><b>10 mL 지점</b> — Ba<sup>2+</sup> 0.5N, OH<sup>−</sup> N 투입 → H<sup>+</sup> 2N−N = N, SO<sub>4</sub><sup>2−</sup> N−0.5N = 0.5N 남음. 전체 1.5N.</li>
+    </ol>
+    <div class="beakers" data-fig="p6sol"></div>
+    <div class="verdict">
+      <span class="o">ㄱ O</span><span>반응한 H<sup>+</sup> = 2N → 물 2N.</span>
+      <span class="x">ㄴ X</span><span>H<sup>+</sup> N, SO<sub>4</sub><sup>2−</sup> 0.5N → H<sup>+</sup>가 2배.</span>
+      <span class="o">ㄷ O</span><span>H<sub>2</sub>SO<sub>4</sub>(aq) 3N/10 mL, Ba(OH)<sub>2</sub>(aq) 3N/20 mL → 2배.</span>
+    </div>
+    <span class="answer">정답 ③ ㄱ, ㄷ</span>
+    <div class="extra">💬 <b>연결 발문</b> — 이 실험에 전구 장치를 연결하면? 20 mL에서 이온이 없으므로 <b>전구가 꺼진다</b>. HCl + NaOH에서는 중화점에도 Na<sup>+</sup>, Cl<sup>−</sup>이 있어 꺼지지 않는다.</div>
+    <div class="skills-used">사용 스킬 : <a class="chip" href="#s8">S8 가수와 앙금</a><a class="chip" href="#s4">S4 전체 이온 수 패턴</a><a class="chip" href="#s10">S10 전체 vs 단위 부피당</a></div>
+  </div></details>
+</article>
+
+<!-- P7 -->
+<article class="card prob" data-answer="4">
+  <div class="prob-head"><span class="pn">07</span><span class="chip src">학평·평가원 이온 모형 유형</span><span class="chip lv">★★★★</span><span class="chip">미지 이온 추론</span></div>
+  <p class="stem">그림은 H<sub>2</sub>SO<sub>4</sub>(aq) 10 mL에 NaOH(aq) 10 mL를 넣은 혼합 용액 (가)에 존재하는 이온을 모형으로 나타낸 것이다. ●, ▲, ■는 서로 다른 이온이다. (나)는 (가)에 같은 NaOH(aq) 10 mL를 더 넣은 혼합 용액이다.</p>
+  <figure data-fig="p7"><figcaption>(가) : 세 종류의 이온이 각각 3개씩</figcaption></figure>
+  <div class="bogi">
+    <p>ㄱ. (가)에 BTB 용액을 떨어뜨리면 파란색을 띤다.</p>
+    <p>ㄴ. (가)에서 생성된 물 분자 수는 (가)에 존재하는 SO<sub>4</sub><sup>2−</sup> 수와 같다.</p>
+    <p>ㄷ. (나)에서 가장 많이 존재하는 이온은 Na<sup>+</sup>이다.</p>
+  </div>
+  <div class="choices" data-opts="ㄱ|ㄷ|ㄱ, ㄴ|ㄴ, ㄷ|ㄱ, ㄴ, ㄷ"></div><div class="feedback"></div>
+  <details class="sol"><summary>풀이 보기</summary><div class="sol-body">
+    <ol>
+      <li><b>이온 종류가 3가지 → 중성은 아니다.</b> (중성이면 Na<sup>+</sup>, SO<sub>4</sub><sup>2−</sup> 2가지)</li>
+      <li><b>염기성이라고 가정해 보자 (귀류법)</b> — 이온은 Na<sup>+</sup>, SO<sub>4</sub><sup>2−</sup>, OH<sup>−</sup>. 전하 균형: Na<sup>+</sup> = 2×SO<sub>4</sub><sup>2−</sup> + OH<sup>−</sup> → Na<sup>+</sup>이 다른 이온보다 반드시 많아야 하는데 세 이온 수가 모두 같다 → <b>모순</b>.</li>
+      <li><b>∴ 산성</b> — 이온은 H<sup>+</sup>, Na<sup>+</sup>, SO<sub>4</sub><sup>2−</sup>. 전하 균형 H<sup>+</sup> + Na<sup>+</sup> = 2×SO<sub>4</sub><sup>2−</sup> → 3 + 3 = 2×3 ✔</li>
+      <li><b>원래 양 복원</b> — H<sub>2</sub>SO<sub>4</sub>(aq) 10 mL : SO<sub>4</sub><sup>2−</sup> 3, H<sup>+</sup> 6. NaOH(aq) 10 mL : Na<sup>+</sup> 3, OH<sup>−</sup> 3 → 반응한 H<sup>+</sup> 3 = 물 3.</li>
+      <li><b>(나)</b> — NaOH(aq) 총 20 mL : OH<sup>−</sup> 6 = H<sup>+</sup> 6 → 중성. 이온은 Na<sup>+</sup> 6, SO<sub>4</sub><sup>2−</sup> 3.</li>
+    </ol>
+    <div class="beakers" data-fig="p7sol"></div>
+    <div class="verdict">
+      <span class="x">ㄱ X</span><span>(가)는 산성 → BTB 노란색.</span>
+      <span class="o">ㄴ O</span><span>물 3 = SO<sub>4</sub><sup>2−</sup> 3.</span>
+      <span class="o">ㄷ O</span><span>Na<sup>+</sup> 6 &gt; SO<sub>4</sub><sup>2−</sup> 3.</span>
+    </div>
+    <span class="answer">정답 ④ ㄴ, ㄷ</span>
+    <div class="skills-used">사용 스킬 : <a class="chip" href="#s6">S6 이온 모형 판별·귀류법</a><a class="chip" href="#s8">S8 가수와 앙금</a><a class="chip" href="#s3">S3 min 규칙</a></div>
+  </div></details>
+</article>
+
+<!-- P8 -->
+<article class="card prob" data-answer="4">
+  <div class="prob-head"><span class="pn">08</span><span class="chip src">수능·평가원 화학Ⅰ 유형 → 고1 변형</span><span class="chip lv">★★★★</span><span class="chip">혼합 용액끼리 섞기</span></div>
+  <p class="stem">표는 HCl(aq)과 NaOH(aq)의 부피를 달리하여 혼합한 용액 (가)와 (나)에 대한 자료이다.</p>
+  <div class="tbl-wrap"><table style="max-width:620px;margin:0 auto">
+    <tr><th>혼합 용액</th><th>HCl(aq) 부피(mL)</th><th>NaOH(aq) 부피(mL)</th><th>액성</th><th>남아 있는 H<sup>+</sup> 또는 OH<sup>−</sup> 수(상댓값)</th></tr>
+    <tr><td>(가)</td><td>20</td><td>10</td><td>산성</td><td>3</td></tr>
+    <tr><td>(나)</td><td>10</td><td>30</td><td>염기성</td><td>1</td></tr>
+  </table></div>
+  <div class="bogi">
+    <p>ㄱ. 단위 부피당 H<sup>+</sup> 수는 HCl(aq)이 NaOH(aq)의 단위 부피당 OH<sup>−</sup> 수의 2배이다.</p>
+    <p>ㄴ. 생성된 물 분자 수는 (가)와 (나)가 같다.</p>
+    <p>ㄷ. (가)와 (나)를 모두 혼합한 용액은 산성이다.</p>
+  </div>
+  <div class="choices" data-opts="ㄱ|ㄴ|ㄷ|ㄱ, ㄷ|ㄴ, ㄷ"></div><div class="feedback"></div>
+  <details class="sol"><summary>풀이 보기</summary><div class="sol-body">
+    <ol>
+      <li><b>미지수</b> — HCl(aq) 1 mL당 H<sup>+</sup> <i>a</i>, NaOH(aq) 1 mL당 OH<sup>−</sup> <i>b</i>.</li>
+      <li><b>남은 이온 = 많은 쪽 − 적은 쪽</b><br>(가) 산성 : 20<i>a</i> − 10<i>b</i> = 3 &nbsp;···①<br>(나) 염기성 : 30<i>b</i> − 10<i>a</i> = 1 &nbsp;···②</li>
+      <li>① + ②×2 : 50<i>b</i> = 5 → <i>b</i> = 0.1, <i>a</i> = 0.2 → <b><i>a</i> : <i>b</i> = 2 : 1</b></li>
+      <li><b>혼합 용액끼리 섞기</b> — (가)에 남은 H<sup>+</sup> 3과 (나)에 남은 OH<sup>−</sup> 1이 다시 반응 → H<sup>+</sup> 2 남음 → 산성.<br><span class="muted small">(전체로 계산해도 HCl 30 mL → H<sup>+</sup> 6, NaOH 40 mL → OH<sup>−</sup> 4 → H<sup>+</sup> 2 남음 ✔)</span></li>
+    </ol>
+    <div class="tbl-wrap"><table>
+      <tr><th></th><th>H<sup>+</sup> 투입</th><th>OH<sup>−</sup> 투입</th><th>생성된 물</th><th>남은 반응 이온</th></tr>
+      <tr><td>(가)</td><td>4</td><td>1</td><td>1</td><td>H<sup>+</sup> 3</td></tr>
+      <tr><td>(나)</td><td>2</td><td>3</td><td>2</td><td>OH<sup>−</sup> 1</td></tr>
+      <tr><td>(가)+(나)</td><td>6</td><td>4</td><td>4</td><td>H<sup>+</sup> 2</td></tr>
+    </table></div>
+    <div class="verdict">
+      <span class="o">ㄱ O</span><span><i>a</i> = 2<i>b</i>.</span>
+      <span class="x">ㄴ X</span><span>(가) 1, (나) 2 → 다르다.</span>
+      <span class="o">ㄷ O</span><span>남은 H<sup>+</sup> 3 &gt; 남은 OH<sup>−</sup> 1 → 산성.</span>
+    </div>
+    <span class="answer">정답 ④ ㄱ, ㄷ</span>
+    <div class="extra">💬 <b>추가 발문</b> — HCl(aq) 15 mL를 중화하는 NaOH(aq)의 부피는? → 15 × 0.2 = 3 = 0.1 × V → <b>30 mL</b></div>
+    <div class="skills-used">사용 스킬 : <a class="chip" href="#s2">S2 미지수 a, b</a><a class="chip" href="#s7">S7 혼합 용액끼리 섞기</a><a class="chip" href="#s3">S3 min 규칙</a></div>
+  </div></details>
+</article>
+</section>
+
+<!-- ================= ⑤ 스킬 ================= -->
+<section id="skills">
+<h2 class="sec"><span class="num">5</span>문제 풀이 스킬 정리</h2>
+<p class="sec-sub">위 8문항에서 반복해서 쓴 무기 10가지와, 어떤 문제든 적용하는 5단계 루틴</p>
+
+<div class="card">
+  <h3>🧭 5단계 풀이 루틴</h3>
+  <div class="flow">
+    <div class="st"><b>STEP 1</b><span>이온화식 쓰기<br><small class="muted">가수 체크 (H₂SO₄, Ba(OH)₂)</small></span></div>
+    <div class="st"><b>STEP 2</b><span>미지수 놓기<br><small class="muted">1 mL당 a, b 또는 모형 개수</small></span></div>
+    <div class="st"><b>STEP 3</b><span>구경꾼 이온으로<br>넣은 양 확인</span></div>
+    <div class="st"><b>STEP 4</b><span>min 규칙으로<br>반응량·남은 이온</span></div>
+    <div class="st"><b>STEP 5</b><span>보기 판별<br><small class="muted">전체? 단위 부피당?</small></span></div>
+  </div>
+</div>
+
+<div class="card skill" id="s1"><div class="sn">S1</div><div>
+  <h3>구경꾼 이온은 "자(ruler)"다</h3>
+  <p>Cl<sup>−</sup>, Na<sup>+</sup>, SO<sub>4</sub><sup>2−</sup>(Ba<sup>2+</sup>가 없을 때)는 반응하지 않으므로 <b>넣은 양 그대로</b> 남습니다. 모형이나 그래프에서 구경꾼 이온의 수를 보면 각 용액을 얼마나 넣었는지 바로 복원됩니다.</p>
+  <div class="eq">Cl⁻ 수 = 넣은 HCl의 양 &nbsp;|&nbsp; Na⁺ 수 = 넣은 NaOH의 양</div>
+  <p class="when">언제? 이온 모형이 주어질 때, "처음 용액에 들어 있던 이온 수"를 물을 때 (01, 07)</p>
+</div></div>
+
+<div class="card skill" id="s2"><div class="sn">S2</div><div>
+  <h3>미지수 a, b — 이온 수 = (단위 부피당 이온 수) × 부피</h3>
+  <p>HCl(aq) 1 mL당 H<sup>+</sup> <i>a</i>개, NaOH(aq) 1 mL당 OH<sup>−</sup> <i>b</i>개로 두면 모든 표 문제가 일차방정식이 됩니다. 구하는 것은 대부분 <b><i>a</i> : <i>b</i></b>라는 <u>비</u>뿐이므로, 상댓값 그대로 계산해도 됩니다.</p>
+  <div class="eq">중화 조건 : a × V<sub>산</sub> = b × V<sub>염기</sub> &nbsp;→&nbsp; a : b = V<sub>염기</sub> : V<sub>산</sub></div>
+  <p class="when">언제? 부피가 다른 혼합 용액 여러 개가 표로 주어질 때 (04, 05, 08)</p>
+</div></div>
+
+<div class="card skill" id="s3"><div class="sn">S3</div><div>
+  <h3>min 규칙 — 생성된 물 = 적은 쪽</h3>
+  <p>H<sup>+</sup>와 OH<sup>−</sup>는 1 : 1로 반응하므로 생성된 물 분자 수는 <b>min(H<sup>+</sup> 수, OH<sup>−</sup> 수)</b>, 남는 이온은 <b>많은 쪽 − 적은 쪽</b>입니다.</p>
+  <div class="eq">H₂O = min(H⁺, OH⁻) &nbsp;|&nbsp; 남은 이온 = |H⁺ − OH⁻|</div>
+  <p class="when">언제? "생성된 물 분자 수", "중화열", "온도"를 비교할 때 (01, 04, 07, 08)</p>
+</div></div>
+
+<div class="card skill" id="s4"><div class="sn">S4</div><div>
+  <h3>전체 이온 수 패턴 — "중화점까지 일정, 이후 증가"</h3>
+  <p>HCl + NaOH, H<sub>2</sub>SO<sub>4</sub> + NaOH처럼 앙금이 없으면, 중화점 전에는 H<sup>+</sup> 1개가 빠지고 Na<sup>+</sup> 1개가 들어와 <b>전체 이온 수가 처음 그대로</b>. 1가 + 1가 조합에서는 다음 공식이 성립합니다.</p>
+  <div class="eq">전체 이온 수 = 2 × max(넣은 H⁺ 수, 넣은 OH⁻ 수)</div>
+  <p class="when">언제? 전체 이온 수 그래프·표가 주어질 때, 꺾이는 점에서 중화점을 찾을 때 (02, 03, 04)</p>
+</div></div>
+
+<div class="card skill" id="s5"><div class="sn">S5</div><div>
+  <h3>그래프 4선 판별법</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th>감소 → 0</th><th>일정</th><th>계속 증가</th><th>0 → 중화점 후 증가</th></tr>
+    <tr><td>원래 용액의<br>반응 이온</td><td>원래 용액의<br>구경꾼 이온</td><td>넣는 용액의<br>구경꾼 이온</td><td>넣는 용액의<br>반응 이온</td></tr>
+  </table></div>
+  <p>"원래 용액이 산인지 염기인지"만 확인하면 네 선의 정체가 자동으로 결정됩니다.</p>
+  <p class="when">언제? 이온 A~D의 수 그래프 (02)</p>
+</div></div>
+
+<div class="card skill" id="s6"><div class="sn">S6</div><div>
+  <h3>이온 모형 판별 — 종류 수, 대소 관계, 귀류법</h3>
+  <ul>
+    <li><b>종류 수</b> : (1가 산 + 1가 염기) 중성이면 2종, 산성·염기성이면 3종.</li>
+    <li><b>대소 관계</b> : 산성이면 산의 음이온이 최다, 염기성이면 염기의 양이온이 최다 (전하 균형).</li>
+    <li><b>귀류법</b> : 산성/염기성 중 하나를 가정 → 전하 균형이나 개수 조건과 모순이면 나머지가 정답.</li>
+  </ul>
+  <p class="when">언제? ●▲■ 같은 기호로 이온을 숨긴 모형 (01, 07)</p>
+</div></div>
+
+<div class="card skill" id="s7"><div class="sn">S7</div><div>
+  <h3>혼합 용액끼리 섞기 — 남은 것끼리만 다시 반응</h3>
+  <p>산성 용액 (가)와 염기성 용액 (나)를 섞으면 <b>(가)에 남은 H<sup>+</sup>와 (나)에 남은 OH<sup>−</sup></b>만 반응합니다. 처음부터 전부 다시 계산할 필요가 없어요.</p>
+  <div class="eq">(가) H⁺ 3 + (나) OH⁻ 1 → H⁺ 2 남음 → 산성</div>
+  <p class="when">언제? "(가)와 (나)를 모두 혼합한 용액" 보기 (08)</p>
+</div></div>
+
+<div class="card skill" id="s8"><div class="sn">S8</div><div>
+  <h3>가수와 앙금 — 2가 이온은 쪼개서 센다</h3>
+  <ul>
+    <li>H<sub>2</sub>SO<sub>4</sub> : H<sup>+</sup> 2 : SO<sub>4</sub><sup>2−</sup> 1 &nbsp;/&nbsp; Ba(OH)<sub>2</sub> : Ba<sup>2+</sup> 1 : OH<sup>−</sup> 2</li>
+    <li>Ba<sup>2+</sup> + SO<sub>4</sub><sup>2−</sup> → BaSO<sub>4</sub>↓ : 이온 수가 <b>두 군데서</b> 줄어 전체 이온 수가 감소, 중화점에서 0.</li>
+    <li>"분자 수"와 "이온 수"를 구분 : H<sub>2</sub>SO<sub>4</sub> N개 → 이온 3N개.</li>
+  </ul>
+  <p class="when">언제? H<sub>2</sub>SO<sub>4</sub>, Ba(OH)<sub>2</sub>, 전구 밝기·전류 문제 (06, 07)</p>
+</div></div>
+
+<div class="card skill" id="s9"><div class="sn">S9</div><div>
+  <h3>온도 그래프 — 꼭짓점 = 중화점, 기울기 비 = 농도 비</h3>
+  <p>총 부피가 일정하면 ΔT ∝ 생성된 물. 왼쪽 직선은 산이 모두 반응하는 구간(기울기 ∝ <i>a</i>), 오른쪽 직선은 염기가 모두 반응하는 구간(기울기 ∝ <i>b</i>)입니다. 측정점이 꼭짓점에 없으면 <b>두 직선을 연장해 교점</b>을 구하세요.</p>
+  <div class="eq">꼭짓점 (V<sub>산</sub>, V<sub>염기</sub>) → a : b = V<sub>염기</sub> : V<sub>산</sub></div>
+  <p class="when">언제? 혼합 용액의 최고 온도·온도 변화 그래프 (05). 총 부피가 다르면 ΔT 비교 시 부피도 고려!</p>
+</div></div>
+
+<div class="card skill" id="s10"><div class="sn">S10</div><div>
+  <h3>"전체" vs "단위 부피당" — 마지막 함정 체크</h3>
+  <p>보기에 <b>단위 부피당</b>이 나오면 반드시 <u>전체 이온 수 ÷ 혼합 용액 부피</u>로 다시 계산합니다. 전체 이온 수가 일정해도 부피가 늘면 단위 부피당 이온 수는 감소합니다.</p>
+  <div class="eq">단위 부피당 이온 수 = 이온 수 ÷ (V<sub>산</sub> + V<sub>염기</sub>)</div>
+  <p class="when">언제? 보기 판별 마지막 단계에서 항상 (02, 03, 06)</p>
+</div></div>
+
+<div class="card">
+  <h3>📋 한 장 요약표</h3>
+  <div class="tbl-wrap"><table class="cheat">
+    <tr><th class="l">물어보는 것</th><th class="l">바로 떠올릴 것</th></tr>
+    <tr><td class="l">액성</td><td class="l">남은 반응 이온이 H⁺면 산성, OH⁻면 염기성, 없으면 중성</td></tr>
+    <tr><td class="l">생성된 물 분자 수 / 중화열</td><td class="l">min(H⁺, OH⁻) — 중화점 이후 더 늘지 않음</td></tr>
+    <tr><td class="l">전체 이온 수</td><td class="l">1가+1가: 2 × max · 앙금 생성 시 감소 → 0</td></tr>
+    <tr><td class="l">가장 많은 이온</td><td class="l">산성 → 산의 음이온 · 염기성 → 염기의 양이온</td></tr>
+    <tr><td class="l">농도 비</td><td class="l">중화점의 부피 비의 역수 (a : b = V염기 : V산)</td></tr>
+    <tr><td class="l">단위 부피당</td><td class="l">전체 부피로 나누기 — 부피가 늘면 감소</td></tr>
+    <tr><td class="l">지시약</td><td class="l">BTB 노·초·파 · 페놀프탈레인은 염기성에서만 붉은색</td></tr>
+  </table></div>
+</div>
+</section>
+
+<p class="small muted" style="text-align:center;margin-top:40px">고1 통합과학 · 중화반응 실전 문제풀이 강의 자료 · 화면 우측 상단 <b>가−/가+</b>로 글자 크기 조절</p>
+</main>
+
+<script>
+(function(){
+"use strict";
+var ION = {
+  H:{label:"H⁺",c:"var(--ion-h)",name:"H⁺"},
+  OH:{label:"OH⁻",c:"var(--ion-oh)",name:"OH⁻"},
+  Na:{label:"Na⁺",c:"var(--ion-na)",name:"Na⁺"},
+  Cl:{label:"Cl⁻",c:"var(--ion-cl)",name:"Cl⁻"},
+  SO4:{label:"SO₄²⁻",c:"var(--ion-so4)",name:"SO₄²⁻",small:true},
+  Ba:{label:"Ba²⁺",c:"var(--ion-ba)",name:"Ba²⁺"},
+  W:{label:"H₂O",c:"var(--ion-w)",name:"H₂O(물)"},
+  P:{label:"BaSO₄",c:"var(--ppt)",name:"BaSO₄(앙금)"},
+  U1:{label:"●",unk:true,name:"●"},U2:{label:"▲",unk:true,name:"▲"},U3:{label:"■",unk:true,name:"■"}
+};
+
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+function ionSVG(type,x,y,r){
+  var t=ION[type];
+  if(type==="W"){
+    return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="'+(r*1.2)+'" ry="'+(r*0.78)+'" style="fill:var(--ion-w)"/>'+
+      '<text x="'+x+'" y="'+(y+r*0.22)+'" text-anchor="middle" font-size="'+(r*0.62)+'" font-weight="700" style="fill:var(--ion-w-ink)">H₂O</text></g>';
+  }
+  if(t.unk){
+    return '<g><circle cx="'+x+'" cy="'+y+'" r="'+r+'" style="fill:var(--surface);stroke:var(--ink-2)" stroke-width="1.6"/>'+
+      '<text x="'+x+'" y="'+(y+r*0.36)+'" text-anchor="middle" font-size="'+(r*1.0)+'" style="fill:var(--ink)">'+t.label+'</text></g>';
+  }
+  var fs=t.small? r*0.6 : r*0.78;
+  return '<g><circle cx="'+x+'" cy="'+y+'" r="'+r+'" style="fill:'+t.c+'"/>'+
+    '<text x="'+x+'" y="'+(y+fs*0.36)+'" text-anchor="middle" font-size="'+fs+'" font-weight="700" fill="#fff">'+t.label+'</text></g>';
+}
+
+/* beaker: ions = {H:2, Cl:4, ...}, opts {water, ppt, tint, seed} */
+function beaker(ions,opts){
+  opts=opts||{};
+  var list=[];
+  Object.keys(ions).forEach(function(k){for(var i=0;i<ions[k];i++)list.push(k);});
+  for(var w=0;w<(opts.water||0);w++)list.push("W");
+  var seed=opts.seed||list.length*7+ (ions.H||0)*3+(ions.OH||0)*5+11;
+  var rand=rng(seed);
+  for(var i=list.length-1;i>0;i--){var j=Math.floor(rand()*(i+1));var tmp=list[i];list[i]=list[j];list[j]=tmp;}
+  var ppt=opts.ppt||0;
+  var W=200,H=190,x0=30,x1=170,y0=52,y1=ppt?160:174;
+  var n=list.length;
+  var cols=n<=4?2:n<=9?3:n<=16?4:n<=25?5:6;
+  var rows=Math.max(1,Math.ceil(n/cols));
+  var cw=(x1-x0)/cols, ch=Math.min(34,(y1-y0)/rows);
+  var r=Math.min(14,cw*0.38,ch*0.44);
+  var top=y1-ch*rows;
+  var tint=opts.tint||"transparent";
+  var s='<svg viewBox="0 0 '+W+' '+H+'" width="'+(opts.w||200)+'" role="img" aria-label="이온 모형">';
+  s+='<path d="M24 40 L24 170 Q24 182 36 182 L164 182 Q176 182 176 170 L176 40 Z" style="fill:'+tint+'" opacity="0.28"/>';
+  s+='<path d="M18 12 L24 18 L24 170 Q24 182 36 182 L164 182 Q176 182 176 170 L176 18 L182 12" fill="none" style="stroke:var(--ink-2)" stroke-width="2.2" stroke-linejoin="round"/>';
+  s+='<line x1="24" y1="40" x2="176" y2="40" style="stroke:var(--ink-3)" stroke-dasharray="4 4" stroke-width="1"/>';
+  for(var k=0;k<n;k++){
+    var row=Math.floor(k/cols), col=k%cols;
+    var inRow=Math.min(cols,n-row*cols);
+    var offset=(cols-inRow)*cw/2;
+    var x=x0+offset+cw*(col+0.5)+(rand()-0.5)*cw*0.22;
+    var y=top+ch*(row+0.5)+(rand()-0.5)*ch*0.18;
+    s+=ionSVG(list[k],+x.toFixed(1),+y.toFixed(1),+r.toFixed(2));
+  }
+  for(var p=0;p<ppt;p++){
+    var px=100-(ppt*24)/2+p*24+12;
+    s+='<rect x="'+(px-11)+'" y="166" width="22" height="12" rx="3" style="fill:var(--ppt)"/>';
+  }
+  if(ppt) s+='<text x="100" y="162" text-anchor="middle" font-size="9" class="svg-ink3">BaSO₄ 앙금</text>';
+  s+='</svg>';
+  return s;
+}
+
+function legendHTML(keys){
+  return keys.map(function(k){
+    var t=ION[k]; var col=t.unk?"var(--surface)":t.c;
+    return '<span><i style="background:'+col+';'+(t.unk?'border:1px solid var(--ink-2)':'')+(k==="P"?';border-radius:3px':'')+'"></i>'+t.name+'</span>';
+  }).join("");
+}
+
+/* line chart */
+function chart(o){
+  var W=o.w||380,H=o.h||260,pl=o.pl||52,pr=o.pr||52,pt=30,pb=o.xticks2?62:46;
+  var sx=function(x){return pl+(x-(o.xmin||0))/(o.xmax-(o.xmin||0))*(W-pl-pr);};
+  var sy=function(y){return H-pb-(y-(o.ymin||0))/(o.ymax-(o.ymin||0))*(H-pt-pb);};
+  var s='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" role="img" aria-label="'+(o.aria||"그래프")+'">';
+  (o.yticks||[]).forEach(function(t){
+    var y=sy(t[0]);
+    s+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y+'" y2="'+y+'" class="svg-line" stroke-width="1"/>';
+    s+='<text x="'+(pl-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="12" class="svg-ink2">'+t[1]+'</text>';
+  });
+  (o.xticks||[]).forEach(function(t){
+    var x=sx(t);
+    s+='<line x1="'+x+'" x2="'+x+'" y1="'+(H-pb)+'" y2="'+(H-pb+5)+'" class="svg-axis" stroke-width="1.2"/>';
+    s+='<text x="'+x+'" y="'+(H-pb+18)+'" text-anchor="middle" font-size="12" class="svg-ink2">'+t+'</text>';
+  });
+  if(o.xticks2){o.xticks2.forEach(function(t){s+='<text x="'+sx(t[0])+'" y="'+(H-pb+34)+'" text-anchor="middle" font-size="11" class="svg-ink3">'+t[1]+'</text>';});}
+  (o.vlines||[]).forEach(function(v){
+    var x=sx(v.x);
+    s+='<line x1="'+x+'" x2="'+x+'" y1="'+pt+'" y2="'+(H-pb)+'" style="stroke:'+(v.color||"var(--ink-3)")+'" stroke-width="1.4" stroke-dasharray="5 4"/>';
+    if(v.label) s+='<text x="'+(x+4)+'" y="'+(pt+12)+'" font-size="11" style="fill:'+(v.color||"var(--ink-3)")+'" font-weight="700">'+v.label+'</text>';
+  });
+  s+='<line x1="'+pl+'" y1="'+pt+'" x2="'+pl+'" y2="'+(H-pb)+'" class="svg-axis" stroke-width="1.6"/>';
+  s+='<line x1="'+pl+'" y1="'+(H-pb)+'" x2="'+(W-pr+6)+'" y2="'+(H-pb)+'" class="svg-axis" stroke-width="1.6"/>';
+  (o.series||[]).forEach(function(se){
+    var d=se.pts.map(function(p,i){return(i?"L":"M")+sx(p[0]).toFixed(1)+" "+sy(p[1]).toFixed(1);}).join(" ");
+    s+='<path d="'+d+'" fill="none" style="stroke:'+se.color+'" stroke-width="'+(se.width||3)+'" stroke-linejoin="round" stroke-linecap="round" '+(se.dash?'stroke-dasharray="'+se.dash+'"':'')+'/>';
+    if(se.dots){se.pts.forEach(function(p){s+='<circle cx="'+sx(p[0])+'" cy="'+sy(p[1])+'" r="4.5" style="fill:'+se.color+'"/>';});}
+    if(se.label){var L=se.pts[se.pts.length-1];
+      s+='<text x="'+(sx(L[0])+7)+'" y="'+(sy(L[1])+4+(se.ldy||0))+'" font-size="13" font-weight="800" style="fill:'+se.color+'">'+se.label+'</text>';}
+  });
+  (o.points||[]).forEach(function(p){
+    s+='<circle cx="'+sx(p.x)+'" cy="'+sy(p.y)+'" r="'+(p.r||5)+'" style="fill:'+(p.color||"var(--accent)")+'"/>';
+    if(p.label)s+='<text x="'+(sx(p.x)+(p.dx||0))+'" y="'+(sy(p.y)+(p.dy||-10))+'" text-anchor="middle" font-size="12" font-weight="700" style="fill:'+(p.color||"var(--accent)")+'">'+p.label+'</text>';
+  });
+  if(o.marker!=null){var mx=sx(o.marker);s+='<line x1="'+mx+'" x2="'+mx+'" y1="'+pt+'" y2="'+(H-pb)+'" style="stroke:var(--accent)" stroke-width="2.5" opacity=".7"/>';}
+  if(o.xlabel) s+='<text x="'+((pl+W-pr)/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="12" class="svg-ink">'+o.xlabel+'</text>';
+  if(o.ylabel) s+='<text x="6" y="14" text-anchor="start" font-size="12" class="svg-ink">'+o.ylabel+'</text>';
+  s+='</svg>';
+  return s;
+}
+
+/* simple diagrams */
+function figIonize(){
+  var s='<svg viewBox="0 0 560 150" width="560" role="img" aria-label="산과 염기의 이온화">';
+  function mol(x,y,a,b,ca,cb,la,lb){
+    return '<circle cx="'+x+'" cy="'+y+'" r="17" style="fill:'+ca+'" opacity=".55"/><circle cx="'+(x+24)+'" cy="'+y+'" r="20" style="fill:'+cb+'" opacity=".55"/>'+
+      '<text x="'+x+'" y="'+(y+4)+'" font-size="12" text-anchor="middle" font-weight="700" class="svg-ink">'+la+'</text><text x="'+(x+24)+'" y="'+(y+4)+'" font-size="12" text-anchor="middle" font-weight="700" class="svg-ink">'+lb+'</text>';
+  }
+  function arrow(x,y){return '<line x1="'+x+'" y1="'+y+'" x2="'+(x+60)+'" y2="'+y+'" style="stroke:var(--ink-2)" stroke-width="2"/><path d="M'+(x+60)+' '+(y-6)+' L'+(x+70)+' '+y+' L'+(x+60)+' '+(y+6)+' Z" style="fill:var(--ink-2)"/><text x="'+(x+35)+'" y="'+(y-10)+'" font-size="11" text-anchor="middle" class="svg-ink3">물에 녹음</text>';}
+  s+='<text x="20" y="22" font-size="13" font-weight="800" style="fill:var(--ion-h)">산</text>';
+  s+=mol(60,45,0,0,"var(--ion-h)","var(--ion-cl)","H","Cl")+arrow(120,45)+ionSVG("H",230,45,17)+'<text x="262" y="50" font-size="16" class="svg-ink2">+</text>'+ionSVG("Cl",292,45,17);
+  s+='<text x="330" y="50" font-size="13" class="svg-ink2">→ <tspan font-weight="800" style="fill:var(--ion-h)">H⁺</tspan>가 산성을 나타냄</text>';
+  s+='<text x="20" y="95" font-size="13" font-weight="800" style="fill:var(--ion-oh)">염기</text>';
+  s+='<circle cx="60" cy="118" r="17" style="fill:var(--ion-na)" opacity=".55"/><circle cx="86" cy="118" r="20" style="fill:var(--ion-oh)" opacity=".55"/><text x="60" y="122" font-size="12" text-anchor="middle" font-weight="700" class="svg-ink">Na</text><text x="86" y="122" font-size="12" text-anchor="middle" font-weight="700" class="svg-ink">OH</text>';
+  s+=arrow(120,118)+ionSVG("Na",230,118,17)+'<text x="262" y="123" font-size="16" class="svg-ink2">+</text>'+ionSVG("OH",292,118,17);
+  s+='<text x="330" y="123" font-size="13" class="svg-ink2">→ <tspan font-weight="800" style="fill:var(--ion-oh)">OH⁻</tspan>가 염기성을 나타냄</text>';
+  return s+'</svg>';
+}
+function figNeut(){
+  var s='<svg viewBox="0 0 560 200" width="560" role="img" aria-label="중화 반응 모형">';
+  s+='<rect x="8" y="34" width="544" height="64" rx="12" style="fill:var(--ion-h)" opacity=".08"/>';
+  s+='<text x="544" y="52" text-anchor="end" font-size="12" font-weight="800" style="fill:var(--bad)">알짜 이온 반응</text>';
+  s+='<rect x="8" y="114" width="544" height="64" rx="12" fill="none" style="stroke:var(--ink-3)" stroke-dasharray="6 5"/>';
+  s+='<text x="544" y="132" text-anchor="end" font-size="12" font-weight="800" class="svg-ink3">구경꾼 이온</text>';
+  s+='<text x="80" y="24" font-size="13" text-anchor="middle" font-weight="700" class="svg-ink2">HCl(aq)</text>';
+  s+='<text x="200" y="24" font-size="13" text-anchor="middle" font-weight="700" class="svg-ink2">NaOH(aq)</text>';
+  s+=ionSVG("H",80,72,19)+ionSVG("Cl",80,150,19)+'<text x="140" y="80" font-size="22" text-anchor="middle" class="svg-ink2">+</text><text x="140" y="158" font-size="22" text-anchor="middle" class="svg-ink2">+</text>'+ionSVG("OH",200,72,19)+ionSVG("Na",200,150,19);
+  s+='<line x1="250" y1="106" x2="320" y2="106" style="stroke:var(--ink-2)" stroke-width="2.4"/><path d="M320 100 L332 106 L320 112 Z" style="fill:var(--ink-2)"/>';
+  s+=ionSVG("W",420,72,24)+'<text x="456" y="77" font-size="12" class="svg-ink2">물 생성 (+열)</text>';
+  s+=ionSVG("Na",400,150,19)+ionSVG("Cl",446,150,19)+'<text x="474" y="155" font-size="12" class="svg-ink2">그대로</text>';
+  return s+'</svg>';
+}
+
+var C={h:"var(--ion-h)",oh:"var(--ion-oh)",na:"var(--ion-na)",cl:"var(--ion-cl)",acc:"var(--accent)"};
+var UNK=["#0d9488","#ea580c","#db2777","#8b5e34"];
+function stepBeakers(arr){
+  return arr.map(function(b){
+    return '<figure>'+beaker(b.ions,{water:b.water,ppt:b.ppt,tint:b.tint,w:170})+'<figcaption><b>'+b.title+'</b><br>'+(b.sub||"")+'</figcaption></figure>';
+  }).join("");
+}
+var tintOf=function(ac){return ac==="acid"?"var(--acid)":ac==="neutral"?"var(--neutral)":"var(--base)";};
+
+var FIGS={
+  ionize:figIonize, neut:figNeut,
+  steps:function(){
+    return stepBeakers([
+      {title:"0 mL",sub:"산성",ions:{H:4,Cl:4},tint:tintOf("acid")},
+      {title:"5 mL",sub:"산성",ions:{H:2,Cl:4,Na:2},water:2,tint:tintOf("acid")},
+      {title:"10 mL",sub:"중화점(중성)",ions:{Cl:4,Na:4},water:4,tint:tintOf("neutral")},
+      {title:"15 mL",sub:"염기성",ions:{Cl:4,Na:6,OH:2},water:4,tint:tintOf("base")},
+      {title:"20 mL",sub:"염기성",ions:{Cl:4,Na:8,OH:4},water:4,tint:tintOf("base")}
+    ]);
+  },
+  graph4:function(){return chart({xmax:25,ymax:10,xticks:[0,5,10,15,20,25],yticks:[[0,"0"],[2,"2"],[4,"4"],[6,"6"],[8,"8"],[10,"10"]],
+    xlabel:"넣은 NaOH(aq) 부피 (mL)",ylabel:"이온 수",vlines:[{x:10,label:"중화점"}],
+    series:[{pts:[[0,4],[10,0],[25,0]],color:C.h,label:"H⁺",ldy:-4},{pts:[[0,4],[25,4]],color:C.cl,label:"Cl⁻",ldy:-6},
+      {pts:[[0,0],[25,10]],color:C.na,label:"Na⁺"},{pts:[[0,0],[10,0],[25,6]],color:C.oh,label:"OH⁻",ldy:6}]});},
+  graphTotal:function(){return chart({xmax:25,ymax:20,xticks:[0,5,10,15,20,25],yticks:[[0,"0"],[4,"4"],[8,"8"],[12,"12"],[16,"16"],[20,"20"]],
+    xlabel:"넣은 NaOH(aq) 부피 (mL)",ylabel:"전체 이온 수",vlines:[{x:10,label:"중화점"}],
+    series:[{pts:[[0,8],[10,8],[25,20]],color:C.acc,label:"전체"}],points:[{x:10,y:8,label:"일정 → 증가",dy:24}]});},
+  total3:function(){
+    var mk=function(title,pts,ymax){return '<figure>'+chart({w:300,h:220,pl:40,pr:20,xmax:20,ymax:ymax,xticks:[0,10,20],yticks:[[0,"0"]],xlabel:"염기 부피 (mL)",ylabel:"전체 이온 수",vlines:[{x:10,label:"중화점"}],series:[{pts:pts,color:C.acc,width:3.5}]})+'<figcaption><b>'+title+'</b></figcaption></figure>';};
+    return mk("HCl + NaOH",[[0,8],[10,8],[20,16]],18)+mk("H₂SO₄ + NaOH",[[0,6],[10,6],[20,14]],18)+mk("H₂SO₄ + Ba(OH)₂",[[0,6],[10,0],[20,6]],18);
+  },
+  tempFixed:function(){return chart({xmax:50,ymax:7,xticks:[0,10,20,30,40,50],xticks2:[[0,"(50)"],[10,"(40)"],[20,"(30)"],[30,"(20)"],[40,"(10)"],[50,"(0)"]],
+    yticks:[[0,"0"],[2,"2"],[4,"4"],[6,"6"]],xlabel:"HCl(aq) 부피 (NaOH(aq) 부피) mL",ylabel:"ΔT(°C)",
+    series:[{pts:[[0,0],[20,6],[50,0]],color:C.acc,dots:false}],points:[{x:20,y:6,label:"꼭짓점 = 중화점",color:"var(--bad)"}]});},
+  tempAdd:function(){return chart({xmax:40,ymin:19,ymax:27,xticks:[0,10,20,30,40],yticks:[[20,"20"],[22,"22"],[24,"24"],[26,"26"]],
+    xlabel:"넣은 NaOH(aq) 부피 (mL)",ylabel:"온도(°C)",vlines:[{x:20}],
+    series:[{pts:[[0,20],[5,21.8],[10,23.4],[15,24.8],[20,26],[25,25.4],[30,24.9],[35,24.4],[40,24]],color:"var(--bad)"}],points:[{x:20,y:26,label:"최고 온도 = 중화점",color:"var(--bad)"}]});},
+  p1:function(){return beaker({H:2,Cl:4,Na:2},{w:220,seed:41})+'<div class="legend">'+legendHTML(["H","Cl","Na"])+'</div>';},
+  p1sol:function(){return stepBeakers([
+    {title:"(가) 5 mL",sub:"산성",ions:{H:2,Cl:4,Na:2},water:2,tint:tintOf("acid")},
+    {title:"(나) 10 mL",sub:"중성",ions:{Cl:4,Na:4},water:4,tint:tintOf("neutral")},
+    {title:"(다) 15 mL",sub:"염기성",ions:{Cl:4,Na:6,OH:2},water:4,tint:tintOf("base")}]);},
+  p2:function(){return chart({xmax:25,ymax:3,xticks:[0,5,10,15,20,25],yticks:[[0,"0"],[1,"N"],[2,"2N"],[3,"3N"]],
+    xlabel:"넣은 NaOH(aq) 부피 (mL)",ylabel:"이온 수",
+    series:[{pts:[[0,1],[10,0],[25,0]],color:UNK[0],label:"A",ldy:-4},{pts:[[0,1],[25,1]],color:UNK[1],label:"B",dash:"8 5"},
+      {pts:[[0,0],[25,2.5]],color:UNK[2],label:"C"},{pts:[[0,0],[10,0],[25,1.5]],color:UNK[3],label:"D",dash:"2 5",width:3.5}]});},
+  p3:function(){return chart({xmax:30,ymax:7,xticks:[0,10,20,30],yticks:[[0,"0"],[2,"2N"],[4,"4N"],[6,"6N"]],
+    xlabel:"넣은 NaOH(aq) 부피 (mL)",ylabel:"전체 이온 수",series:[{pts:[[0,4],[20,4],[30,6]],color:C.acc,dots:true}]});},
+  p5:function(){return chart({xmax:50,ymax:7,xticks:[0,10,20,30,40,50],xticks2:[[0,"(50)"],[10,"(40)"],[20,"(30)"],[30,"(20)"],[40,"(10)"],[50,"(0)"]],
+    yticks:[[0,"0"],[1,"1"],[2,"2"],[3,"3"],[4,"4"],[5,"5"],[6,"6"]],xlabel:"HCl(aq) 부피 (NaOH(aq) 부피) mL",ylabel:"ΔT(°C)",
+    series:[{pts:[[0,0],[10,3],[20,6],[30,4],[40,2],[50,0]],color:C.acc,dots:true}]});},
+  p5sol:function(){return chart({xmax:50,ymax:7,xticks:[0,10,20,30,40,50],yticks:[[0,"0"],[2,"2"],[4,"4"],[6,"6"]],
+    xlabel:"HCl(aq) 부피 (mL)",ylabel:"ΔT(°C)",vlines:[{x:20,color:"var(--bad)"}],
+    series:[{pts:[[0,0],[20,6]],color:C.h,label:"",width:3.5},{pts:[[20,6],[50,0]],color:C.oh,width:3.5}],
+    points:[{x:10,y:3,color:C.h,label:"HCl 모두 반응",dx:-48,dy:-6},{x:40,y:2,color:C.oh,label:"NaOH 모두 반응",dx:4,dy:26},{x:20,y:6,color:"var(--bad)",label:"중화점 (HCl 20 : NaOH 30)",dy:-12}]});},
+  p6:function(){return chart({xmax:30,ymax:3.5,xticks:[0,10,20,30],yticks:[[0,"0"],[1,"N"],[2,"2N"],[3,"3N"]],
+    xlabel:"넣은 Ba(OH)₂(aq) 부피 (mL)",ylabel:"전체 이온 수",series:[{pts:[[0,3],[20,0],[30,1.5]],color:C.acc,dots:true}]});},
+  p6sol:function(){return stepBeakers([
+    {title:"0 mL",sub:"H⁺ 2N, SO₄²⁻ N (N=2개로 표시)",ions:{H:4,SO4:2},tint:tintOf("acid")},
+    {title:"10 mL",sub:"H⁺ N, SO₄²⁻ 0.5N",ions:{H:2,SO4:1},water:2,ppt:1,tint:tintOf("acid")},
+    {title:"20 mL",sub:"이온 0개 (중성)",ions:{},water:4,ppt:2,tint:tintOf("neutral")},
+    {title:"30 mL",sub:"Ba²⁺ 0.5N, OH⁻ N",ions:{Ba:1,OH:2},water:4,ppt:2,tint:tintOf("base")}])+
+    '<div class="legend" style="grid-column:1/-1">'+legendHTML(["H","SO4","Ba","OH","W","P"])+'</div>';},
+  p7:function(){return beaker({U1:3,U2:3,U3:3},{w:220,seed:77});},
+  p7sol:function(){return stepBeakers([
+    {title:"(가) 산성",sub:"H⁺ 3, Na⁺ 3, SO₄²⁻ 3",ions:{H:3,Na:3,SO4:3},water:3,tint:tintOf("acid")},
+    {title:"(나) 중성",sub:"Na⁺ 6, SO₄²⁻ 3",ions:{Na:6,SO4:3},water:6,tint:tintOf("neutral")}])+
+    '<div class="legend" style="grid-column:1/-1">'+legendHTML(["H","Na","SO4","W"])+'</div>';}
+};
+
+document.querySelectorAll("[data-fig]").forEach(function(el){
+  var f=FIGS[el.getAttribute("data-fig")]; if(!f)return;
+  var cap=el.querySelector("figcaption");
+  el.innerHTML=f();
+  if(cap) el.appendChild(cap);
+});
+document.querySelectorAll("[data-legend]").forEach(function(el){el.innerHTML=legendHTML(el.getAttribute("data-legend").split(","));});
+
+/* choices & grading */
+var NUMS=["①","②","③","④","⑤"];
+document.querySelectorAll(".prob").forEach(function(card){
+  var box=card.querySelector(".choices"), fb=card.querySelector(".feedback");
+  var ans=parseInt(card.getAttribute("data-answer"),10);
+  box.innerHTML=box.getAttribute("data-opts").split("|").map(function(t,i){return '<button type="button" data-i="'+(i+1)+'">'+NUMS[i]+' '+t+'</button>';}).join("");
+  box.addEventListener("click",function(e){
+    var b=e.target.closest("button"); if(!b)return;
+    var i=parseInt(b.getAttribute("data-i"),10);
+    if(i===ans){b.classList.add("right");fb.style.color="var(--good)";fb.textContent="정답입니다! 풀이로 근거를 확인해 보세요.";}
+    else{b.classList.add("wrong");fb.style.color="var(--bad)";fb.textContent="다시 생각해 보세요. (보기 하나씩 O/X 판정)";}
+  });
+});
+document.getElementById("resetChoices").onclick=function(){
+  document.querySelectorAll(".choices button").forEach(function(b){b.classList.remove("right","wrong");});
+  document.querySelectorAll(".feedback").forEach(function(f){f.textContent="";});
+};
+document.getElementById("openAll").onclick=function(){document.querySelectorAll("details.sol").forEach(function(d){d.open=true;});};
+document.getElementById("closeAll").onclick=function(){document.querySelectorAll("details.sol").forEach(function(d){d.open=false;});};
+
+/* OX */
+document.querySelectorAll("#oxList li").forEach(function(li){li.querySelector("button").onclick=function(){li.classList.toggle("show");};});
+
+/* font size & theme */
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){return null;}}
+var fs=parseFloat(store("neut-fs"))||17;
+function applyFs(){document.documentElement.style.fontSize=fs+"px";}
+applyFs();
+document.getElementById("fontUp").onclick=function(){fs=Math.min(24,fs+1);applyFs();store("neut-fs",fs);};
+document.getElementById("fontDown").onclick=function(){fs=Math.max(13,fs-1);applyFs();store("neut-fs",fs);};
+var th=store("neut-theme"); if(th)document.documentElement.setAttribute("data-theme",th);
+document.getElementById("themeBtn").onclick=function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var next=dark?"light":"dark";document.documentElement.setAttribute("data-theme",next);store("neut-theme",next);
+};
+
+/* simulator */
+var MODES={
+  hcl:{acidH:4,anion:"Cl",anionN:4,base:"Na",perUnitCat:1,step:1,acidName:"HCl(aq)",baseName:"NaOH(aq)",
+    note:"중화점(10 mL) 전까지 전체 이온 수 8개 유지 → 이후 2개씩 증가"},
+  h2so4:{acidH:4,anion:"SO4",anionN:2,base:"Na",perUnitCat:1,step:1,acidName:"H₂SO₄(aq)",baseName:"NaOH(aq)",
+    note:"H₂SO₄는 H⁺를 2개씩 내놓는다. 중화점 전까지 전체 이온 수 6개 유지"},
+  ba:{acidH:4,anion:"SO4",anionN:2,base:"Ba",perUnitCat:0.5,step:2,ppt:true,acidName:"H₂SO₄(aq)",baseName:"Ba(OH)₂(aq)",
+    note:"Ba²⁺와 SO₄²⁻가 앙금(BaSO₄)이 되어 전체 이온 수가 감소 → 중화점에서 0"}
+};
+var mode="hcl";
+var rangeEl=document.getElementById("simRange");
+function state(m,k){
+  var M=MODES[m];
+  var oh=k, cat=k*M.perUnitCat;
+  var H=Math.max(0,M.acidH-oh), OH=Math.max(0,oh-M.acidH), W=Math.min(M.acidH,oh);
+  var an=M.anionN, ppt=0;
+  if(M.ppt){ppt=Math.min(cat,an);an-=ppt;cat-=ppt;}
+  var ions={};ions.H=H;ions[M.anion]=an;ions[M.base]=cat;ions.OH=OH;
+  var total=H+an+cat+OH;
+  var ac=H>0?"acid":OH>0?"base":"neutral";
+  return{ions:ions,W:W,ppt:ppt,total:total,ac:ac,vol:k*2.5};
+}
+function renderSim(){
+  var M=MODES[mode], k=parseInt(rangeEl.value,10), st=state(mode,k);
+  document.getElementById("simVol").textContent=st.vol;
+  document.getElementById("simBeaker").innerHTML=beaker(st.ions,{water:st.W,ppt:st.ppt,tint:tintOf(st.ac),w:260,seed:13+k});
+  var keys=["H",M.anion,M.base,"OH","W"];if(M.ppt)keys.push("P");
+  document.getElementById("simLegend").innerHTML=legendHTML(keys);
+  var acTxt={acid:'<span class="tag-acid">산성</span>',neutral:'<span class="tag-neutral">중성</span>',base:'<span class="tag-base">염기성</span>'}[st.ac];
+  var bt={acid:"노란색",neutral:"초록색",base:"파란색"}[st.ac];
+  var ph={acid:"무색",neutral:"무색",base:"붉은색"}[st.ac];
+  var html='<div><small>액성</small><b>'+acTxt+'</b></div><div><small>BTB / 페놀프탈레인</small><b>'+bt+' / '+ph+'</b></div>'+
+    '<div><small>전체 이온 수</small><b>'+st.total+'</b></div><div><small>생성된 물</small><b>'+st.W+'</b></div>';
+  keys.forEach(function(kk){if(kk==="W"||kk==="P")return;html+='<div><small>'+ION[kk].name+'</small><b style="color:'+ION[kk].c+'">'+st.ions[kk]+'</b></div>';});
+  if(M.ppt)html+='<div><small>BaSO₄ 앙금</small><b>'+st.ppt+'</b></div>';
+  document.getElementById("simStat").innerHTML=html;
+  var series=[], ks=[0,1,2,3,4,5,6,7,8].filter(function(x){return x%M.step===0;});
+  var colOf={H:C.h,OH:C.oh,Na:C.na,Cl:C.cl,SO4:"var(--ion-so4)",Ba:"var(--ion-ba)"};
+  ["H",M.anion,M.base,"OH"].forEach(function(kk){
+    series.push({pts:ks.map(function(x){return[x*2.5,state(mode,x).ions[kk]];}),color:colOf[kk],label:ION[kk].label,width:2.5});
+  });
+  series.push({pts:ks.map(function(x){return[x*2.5,state(mode,x).total];}),color:"var(--ink)",label:"전체",dash:"6 4",width:2.5});
+  var lab={};series.forEach(function(se){var y=se.pts[se.pts.length-1][1];lab[y]=(lab[y]||0)+1;se.ldy=-(lab[y]-1)*13;});
+  document.getElementById("simChart").innerHTML=chart({xmax:20,ymax:12,xticks:[0,5,10,15,20],yticks:[[0,"0"],[4,"4"],[8,"8"],[12,"12"]],
+    xlabel:"넣은 "+M.baseName+" 부피 (mL)",ylabel:"이온 수",series:series,marker:st.vol,vlines:[{x:10,label:"중화점"}],pr:58});
+  document.getElementById("simNote").textContent=M.acidName+" 10 mL + "+M.baseName+" · "+M.note;
+}
+document.querySelectorAll("#simMode button").forEach(function(b){
+  b.onclick=function(){
+    mode=b.getAttribute("data-mode");
+    document.querySelectorAll("#simMode button").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});
+    rangeEl.step=MODES[mode].step; var v=parseInt(rangeEl.value,10); rangeEl.value=v-(v%MODES[mode].step);
+    renderSim();
+  };
+});
+rangeEl.addEventListener("input",renderSim);
+renderSim();
+})();
+</script>
+</body>
+</html>
